@@ -58,7 +58,7 @@ func shoot_at_first_enemy() -> void:
 	projectile.shooter = self
 	projectile.damage = damage
 	get_tree().current_scene.add_child(projectile)
-	projectile.global_position = global_position + direction * 0.8 + Vector3.UP * 0.2
+	projectile.global_position = global_position + direction * 1.2 + Vector3.UP * 0.2
 	projectile.direction = direction
 	shot_timer = shot_interval
 
@@ -107,7 +107,7 @@ func _criar_visual_de_alcance() -> void:
 
 	var visual := MeshInstance3D.new()
 	visual.name = "IndicadorAlcance"
-	visual.position.y = -0.36
+	visual.position.y = -0.98
 	visual.mesh = anel
 	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(visual)

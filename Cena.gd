@@ -1,15 +1,16 @@
 extends Node3D
 
 const ENEMY_SCENE = preload("res://Enemy.tscn")
+const METRICA_MAPA = preload("res://MetricaMapa.gd")
 const BASIC_TOWER_COST = 75
 const FAST_TOWER_COST = 60
 
 @export var enemy_count = 20
-@export var spawn_interval = 0.7
-@export var enemy_vertical_offset = 0.62
+@export var spawn_interval: float = 1.2
+@export var enemy_vertical_offset: float = 1.12
 @export var player_health = 100
 @export var player_energy: int = 100
-@export var path_visual_width: float = 0.8925
+@export var path_visual_width: float = METRICA_MAPA.LARGURA_CAMINHO
 @export var path_surface_offset: float = 0.13
 
 @onready var caminho: Path3D = $Path3D
@@ -105,6 +106,7 @@ func _on_gerenciar_torres_pressed() -> void:
 	if not partida_iniciada:
 		return
 	botao_jogo.text = "Voltar ao jogo"
+	botao_gerenciar_torres.hide()
 	menu_torres.show()
 	get_tree().paused = true
 
@@ -153,6 +155,7 @@ func _atualizar_economia() -> void:
 func _on_game_play_pressed() -> void:
 	if partida_iniciada:
 		menu_torres.hide()
+		botao_gerenciar_torres.show()
 		get_tree().paused = false
 		return
 
@@ -169,10 +172,20 @@ func _on_game_play_pressed() -> void:
 
 func _configurar_camera() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-	camera.size = 29.5
-	var centro_mapa := Vector3(-8.15, malha_chao.global_position.y, 0.0)
+	camera.keep_aspect = Camera3D.KEEP_HEIGHT
+	var tamanho_viewport := get_viewport().get_visible_rect().size
+	var aspecto := tamanho_viewport.x / maxf(tamanho_viewport.y, 1.0)
+	var tamanho_efetivo := METRICA_MAPA.tamanho_efetivo(aspecto)
+	camera.size = tamanho_efetivo.y
+	var largura_view := tamanho_efetivo.x / (1.0 - METRICA_MAPA.FRACAO_CONTROLES)
+	var largura_controles := largura_view * METRICA_MAPA.FRACAO_CONTROLES
+	var centro_mapa := Vector3(-largura_controles * 0.5, malha_chao.global_position.y, 0.0)
 	camera.global_position = centro_mapa + Vector3(0.0, 34.0, 8.0)
 	camera.look_at(centro_mapa, Vector3.UP)
+	var plano := malha_chao.mesh as PlaneMesh
+	if plano != null:
+		plano.size = Vector2(largura_view + 1.0, camera.size / cos(atan2(8.0, 34.0)) + 1.0)
+	malha_chao.global_position = Vector3(centro_mapa.x, malha_chao.global_position.y, centro_mapa.z)
 
 func _criar_visual_do_caminho() -> void:
 	var pontos := caminho.curve.get_baked_points()
