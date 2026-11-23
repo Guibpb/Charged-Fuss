@@ -1,22 +1,21 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene format=3 uid="uid://dq1wbj116ahiw"]
 
-[ext_resource type="Script" path="res://TorreRapida.gd" id="1_script"]
+[ext_resource type="Script" uid="uid://bdfndnqk3njnt" path="res://TorreRapida.gd" id="1_script"]
+[ext_resource type="ArrayMesh" uid="uid://dvjjduuivaegc" path="res://modelos/Turret1.obj" id="2_model"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_torre"]
-size = Vector3(2, 2, 2)
-
-[sub_resource type="BoxMesh" id="BoxMesh_torre"]
 size = Vector3(2, 2, 2)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_torre"]
 albedo_color = Color(0.12632814, 0.48487997, 0.6125, 1)
 
-[node name="TorreRapida" type="CharacterBody3D"]
+[node name="TorreRapida" type="CharacterBody3D" unique_id=244451891]
 script = ExtResource("1_script")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=976741053]
 shape = SubResource("BoxShape3D_torre")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-mesh = SubResource("BoxMesh_torre")
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=498635698]
+transform = Transform3D(5.2469473e-09, 0, -0.44, 0, 0.44, 0, 0.44, 0, 5.2469473e-09, 0, -1, -0.24)
+mesh = ExtResource("2_model")
 surface_material_override/0 = SubResource("StandardMaterial3D_torre")

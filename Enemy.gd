@@ -3,13 +3,11 @@ extends CharacterBody3D
 signal reached_end
 signal defeated
 
-@export var speed = 3
+@export var speed = 4
 @export var gravity = 9.8
-@export var shot_range = 10.0
-@export var shot_interval = 1.5
-@export var projectile_scene: PackedScene = preload("res://Projectile.tscn")
-var health = 25
-var shot_timer = 0.0
+
+var health = 40
+
 var caminho: PathFollow3D
 var death_processed := false
 

@@ -67,7 +67,32 @@ func _ready() -> void:
 		push_error("O Path3D precisa ter uma curva com pelo menos dois pontos.")
 		botao_jogo.disabled = true
 	else:
+		_orientar_torres_para_caminho()
 		_criar_visual_do_caminho()
+
+func _orientar_torres_para_caminho() -> void:
+	var pontos := caminho.curve.get_baked_points()
+	if pontos.is_empty():
+		return
+
+	for torre in torres:
+		var torre_3d := torre as Node3D
+		if torre_3d == null:
+			continue
+		var ponto_mais_proximo := caminho.to_global(pontos[0])
+		var menor_distancia := INF
+		for ponto in pontos:
+			var ponto_global := caminho.to_global(ponto)
+			var diferenca := ponto_global - torre_3d.global_position
+			diferenca.y = 0.0
+			var distancia_quadrada := diferenca.length_squared()
+			if distancia_quadrada < menor_distancia:
+				menor_distancia = distancia_quadrada
+				ponto_mais_proximo = ponto_global
+		ponto_mais_proximo.y = torre_3d.global_position.y
+		var direcao_setor := ponto_mais_proximo - torre_3d.global_position
+		if torre_3d.has_method("definir_direcao_setor"):
+			torre_3d.call("definir_direcao_setor", direcao_setor)
 
 func spawn_queue() -> void:
 	for i in range(enemy_count):
@@ -105,10 +130,9 @@ func _on_menu_play_pressed() -> void:
 func _on_gerenciar_torres_pressed() -> void:
 	if not partida_iniciada:
 		return
-	botao_jogo.text = "Voltar ao jogo"
+	botao_jogo.text = "Fechar painel"
 	botao_gerenciar_torres.hide()
 	menu_torres.show()
-	get_tree().paused = true
 
 func _ativar_torre(indice: int, tipo: String) -> void:
 	if indice < 0 or indice >= torres.size() or not tipos_ativados[indice].is_empty():
@@ -146,7 +170,7 @@ func _atualizar_economia() -> void:
 		botao_ativar_rapida[indice].disabled = not tipo.is_empty() or player_energy < FAST_TOWER_COST
 
 	if partida_iniciada:
-		botao_jogo.text = "Voltar ao jogo"
+		botao_jogo.text = "Fechar painel"
 		botao_jogo.disabled = false
 	else:
 		botao_jogo.text = "Começar jogo"
@@ -156,7 +180,6 @@ func _on_game_play_pressed() -> void:
 	if partida_iniciada:
 		menu_torres.hide()
 		botao_gerenciar_torres.show()
-		get_tree().paused = false
 		return
 
 	menu_torres.hide()
