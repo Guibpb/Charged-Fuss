@@ -130,7 +130,7 @@ func _on_menu_play_pressed() -> void:
 func _on_gerenciar_torres_pressed() -> void:
 	if not partida_iniciada:
 		return
-	botao_jogo.text = "Fechar painel"
+	botao_jogo.text = "FECHAR PAINEL"
 	botao_gerenciar_torres.hide()
 	menu_torres.show()
 
@@ -161,19 +161,21 @@ func _atualizar_economia() -> void:
 	for indice in range(tipos_ativados.size()):
 		var tipo := tipos_ativados[indice]
 		if tipo.is_empty():
-			status_torres[indice].text = "Torre %d — desligada" % (indice + 1)
+			status_torres[indice].text = "TORRE %02d  •  DESLIGADA" % (indice + 1)
+			status_torres[indice].add_theme_color_override("font_color", Color(0.62, 0.7, 0.74, 1))
 		else:
 			quantidade_ativas += 1
 			var nome_tipo := "rápida" if tipo == "rapida" else "normal"
-			status_torres[indice].text = "Torre %d — %s ativa" % [indice + 1, nome_tipo]
+			status_torres[indice].text = "TORRE %02d  •  %s" % [indice + 1, nome_tipo.to_upper()]
+			status_torres[indice].add_theme_color_override("font_color", Color(0.4, 0.88, 0.84, 1))
 		botao_ativar_basica[indice].disabled = not tipo.is_empty() or player_energy < BASIC_TOWER_COST
 		botao_ativar_rapida[indice].disabled = not tipo.is_empty() or player_energy < FAST_TOWER_COST
 
 	if partida_iniciada:
-		botao_jogo.text = "Fechar painel"
+		botao_jogo.text = "FECHAR PAINEL"
 		botao_jogo.disabled = false
 	else:
-		botao_jogo.text = "Começar jogo"
+		botao_jogo.text = "INICIAR PARTIDA"
 		botao_jogo.disabled = quantidade_ativas == 0
 
 func _on_game_play_pressed() -> void:

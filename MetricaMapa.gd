@@ -1,7 +1,7 @@
 extends RefCounted
 
 # Padrão para todos os mapas: em 16:9, reserva-se 22% da largura para controles.
-const ALTURA_EFETIVA: float = 25
+const ALTURA_EFETIVA: float = 27
 const FRACAO_CONTROLES: float = 0.22
 const ESCALA_OBJETOS: float = 2.0
 const LARGURA_CAMINHO: float = 1.785

@@ -23,12 +23,145 @@ _data = {
 }
 point_count = 8
 
-[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_painel_torres"]
-content_margin_left = 12.0
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill_vida"]
+bg_color = Color(0.035, 0.065, 0.085, 0.94)
+border_width_left = 3
+border_color = Color(0.95, 0.2, 0.25, 1)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill_energia"]
+bg_color = Color(0.035, 0.065, 0.085, 0.94)
+border_width_right = 3
+border_color = Color(0.18, 0.83, 0.88, 1)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_disabled"]
+content_margin_left = 18.0
 content_margin_top = 10.0
-content_margin_right = 12.0
+content_margin_right = 18.0
 content_margin_bottom = 10.0
-bg_color = Color(0.12, 0.125, 0.13, 0.96)
+bg_color = Color(0.045, 0.075, 0.09, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12, 0.2, 0.23, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.11, 0.24, 0.28, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.82, 0.82, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_normal"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.075, 0.13, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.34, 0.39, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_pressed"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.43, 0.48, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.92, 0.88, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_interface"]
+default_font_size = 16
+Button/colors/font_color = Color(0.88, 0.94, 0.97, 1)
+Button/colors/font_disabled_color = Color(0.49, 0.59, 0.63, 1)
+Button/colors/font_hover_color = Color(0.96, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/styles/disabled = SubResource("StyleBoxFlat_botao_disabled")
+Button/styles/focus = SubResource("StyleBoxFlat_botao_hover")
+Button/styles/hover = SubResource("StyleBoxFlat_botao_hover")
+Button/styles/normal = SubResource("StyleBoxFlat_botao_normal")
+Button/styles/pressed = SubResource("StyleBoxFlat_botao_pressed")
+Label/colors/font_color = Color(0.88, 0.93, 0.96, 1)
+Label/colors/font_disabled_color = Color(0.54, 0.63, 0.67, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cartao_inicio"]
+content_margin_left = 36.0
+content_margin_top = 30.0
+content_margin_right = 36.0
+content_margin_bottom = 30.0
+bg_color = Color(0.035, 0.065, 0.085, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12, 0.68, 0.72, 0.72)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 22
+shadow_offset = Vector2(0, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_painel_torres"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+bg_color = Color(0.035, 0.065, 0.085, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.16, 0.45, 0.52, 0.8)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 12
+shadow_offset = Vector2(0, 5)
 
 [node name="Game" type="Node3D" unique_id=1938844436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.50910604, 0)
@@ -112,10 +245,29 @@ outline_size = 16
 [node name="HUD" type="CanvasLayer" parent="." unique_id=922765045]
 process_mode = 3
 
+[node name="VidaPainel" type="Panel" parent="HUD" unique_id=1710347492]
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 292.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_vida")
+
+[node name="EnergiaPainel" type="Panel" parent="HUD" unique_id=1008499494]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -214.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 68.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_energia")
+
 [node name="VidaLabel" type="Label" parent="HUD" unique_id=1998607069]
-offset_left = 20.0
-offset_top = 20.0
-offset_right = 280.0
+offset_left = 28.0
+offset_top = 21.0
+offset_right = 284.0
 offset_bottom = 64.0
 theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
@@ -128,7 +280,7 @@ visible = false
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = -204.0
+offset_left = -202.0
 offset_top = 20.0
 offset_right = -24.0
 offset_bottom = 58.0
@@ -142,59 +294,88 @@ horizontal_alignment = 2
 [node name="GerenciarTorres" type="Button" parent="HUD" unique_id=754939276]
 visible = false
 offset_left = 20.0
-offset_top = 68.0
-offset_right = 190.0
-offset_bottom = 112.0
-theme_override_font_sizes/font_size = 20
-text = "Ativar torres"
+offset_top = 80.0
+offset_right = 236.0
+offset_bottom = 128.0
+theme = SubResource("Theme_interface")
+theme_override_font_sizes/font_size = 17
+text = "GERENCIAR TORRES"
 
 [node name="MenuInicial" type="Control" parent="HUD" unique_id=106558292]
 process_mode = 3
-mouse_filter = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_interface")
 
 [node name="Fundo" type="ColorRect" parent="HUD/MenuInicial" unique_id=630437965]
-mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.035, 0.075, 0.09, 1)
+mouse_filter = 2
+color = Color(0.018, 0.035, 0.052, 1)
+
+[node name="CartaoInicio" type="Panel" parent="HUD/MenuInicial" unique_id=539697308]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -220.0
+offset_right = 320.0
+offset_bottom = 220.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cartao_inicio")
 
 [node name="Centralizar" type="CenterContainer" parent="HUD/MenuInicial" unique_id=928555061]
-mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 
 [node name="Conteudo" type="VBoxContainer" parent="HUD/MenuInicial/Centralizar" unique_id=1885110450]
-mouse_filter = 2
 layout_mode = 2
-theme_override_constants/separation = 28
+mouse_filter = 2
+theme_override_constants/separation = 18
 alignment = 1
 
 [node name="Titulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=398344981]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.91, 0.96, 0.92, 1)
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 58
 text = "Tower Defense"
 horizontal_alignment = 1
 
-[node name="Play" type="Button" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=232377009]
-custom_minimum_size = Vector2(220, 62)
+[node name="Subtitulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=2137112215]
 layout_mode = 2
-theme_override_font_sizes/font_size = 30
-text = "Play"
+theme_override_colors/font_color = Color(0.34, 0.83, 0.86, 1)
+theme_override_font_sizes/font_size = 16
+text = "DEFESA TÁTICA  /  PROTÓTIPO"
+horizontal_alignment = 1
+
+[node name="Play" type="Button" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=232377009]
+custom_minimum_size = Vector2(270, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "INICIAR PARTIDA"
+
+[node name="Rodape" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=179647098]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.67, 0.72, 1)
+theme_override_font_sizes/font_size = 13
+text = "QUATRO TORRES  •  ENERGIA  •  ROTA ATIVA"
+horizontal_alignment = 1
 
 [node name="MenuTorres" type="Control" parent="HUD" unique_id=1017328288]
 process_mode = 3
@@ -206,6 +387,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+theme = SubResource("Theme_interface")
 
 [node name="Fundo" type="ColorRect" parent="HUD/MenuTorres" unique_id=1121561100]
 layout_mode = 1
@@ -215,7 +397,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-color = Color(0.015, 0.035, 0.04, 0.18)
+color = Color(0.008, 0.02, 0.03, 0.34)
 
 [node name="Painel" type="PanelContainer" parent="HUD/MenuTorres" unique_id=845338185]
 custom_minimum_size = Vector2(320, 570)
@@ -232,15 +414,17 @@ theme_override_constants/separation = 8
 
 [node name="Titulo" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=818158494]
 layout_mode = 2
-theme_override_font_sizes/font_size = 24
-text = "Ativação das torres"
+theme_override_colors/font_color = Color(0.45, 0.9, 0.91, 1)
+theme_override_font_sizes/font_size = 21
+text = "ATIVAÇÃO DAS TORRES"
 horizontal_alignment = 1
 
 [node name="Instrucao" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=7650161]
-custom_minimum_size = Vector2(280, 72)
+custom_minimum_size = Vector2(280, 54)
 layout_mode = 2
-theme_override_font_sizes/font_size = 15
-text = "Escolha como ativar cada torre. As desligadas não atacam; você pode abrir este painel durante a partida."
+theme_override_colors/font_color = Color(0.67, 0.76, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ative as torres com energia. As desligadas não atacam."
 autowrap_mode = 3
 
 [node name="Torre1" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1131273396]
@@ -344,16 +528,17 @@ theme_override_font_sizes/font_size = 16
 text = "Rápida · 60 E"
 
 [node name="Status" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=853670083]
-custom_minimum_size = Vector2(280, 48)
+custom_minimum_size = Vector2(280, 42)
 layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.75, 0.42, 1)
 theme_override_font_sizes/font_size = 15
-text = "Ative pelo menos uma torre para começar."
+text = "Ative pelo menos uma torre para iniciar a defesa."
 autowrap_mode = 3
 
 [node name="Comecar" type="Button" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=635226837]
-custom_minimum_size = Vector2(280, 54)
+custom_minimum_size = Vector2(280, 56)
 layout_mode = 2
-theme_override_font_sizes/font_size = 20
-text = "Começar jogo"
+theme_override_font_sizes/font_size = 18
+text = "INICIAR PARTIDA"
 
 [connection signal="pressed" from="HUD/MenuInicial/Centralizar/Conteudo/Play" to="." method="_on_menu_play_pressed"]
