@@ -34,6 +34,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 @onready var ganho_energia_label: Label = $HUD/GanhoEnergiaLabel
 @onready var painel_rodada: Panel = $HUD/PainelRodada
 @onready var rodada_label: Label = $HUD/PainelRodada/RodadaLabel
+@onready var velocidade_label: Label = $HUD/VelocidadeLabel
 @onready var menu_inicial: Control = $HUD/MenuInicial
 @onready var menu_torres: Control = $HUD/MenuTorres
 @onready var botao_jogo: Button = $HUD/MenuTorres/Painel/Conteudo/Comecar
@@ -78,8 +79,12 @@ var fase_encerrada: bool = false
 var energia_ganha_em_eliminacoes: int = 0
 var energia_ganha_em_rodadas: int = 0
 var revisao_ganho_energia: int = 0
+var nivel_velocidade: int = 1
+var sequencia_cheat: String = ""
 
 func _ready() -> void:
+	Engine.time_scale = 1.0
+	set_process_unhandled_key_input(true)
 	get_tree().paused = true
 	_configurar_camera()
 	_update_health_label()
@@ -245,6 +250,9 @@ func _encerrar_fase(vitoria: bool) -> void:
 	menu_torres.hide()
 	botao_gerenciar_torres.hide()
 	botao_pause.hide()
+	velocidade_label.hide()
+	Engine.time_scale = 1.0
+	nivel_velocidade = 1
 	if vitoria:
 		rodada_label.text = "FASE CONCLUÍDA"
 	else:
@@ -257,6 +265,61 @@ func _alternar_pausa() -> void:
 	get_tree().paused = not get_tree().paused
 	botao_pause.text = "CONTINUAR" if get_tree().paused else "PAUSAR"
 
+func _unhandled_key_input(event: InputEvent) -> void:
+	var tecla_evento: InputEventKey = event as InputEventKey
+	if tecla_evento == null or not tecla_evento.pressed or tecla_evento.echo:
+		return
+	if menu_inicial.visible or fase_encerrada:
+		sequencia_cheat = ""
+		return
+
+	if tecla_evento.keycode == KEY_V:
+		sequencia_cheat = ""
+		if partida_iniciada:
+			_alternar_velocidade()
+		return
+
+	var letra: String = ""
+	match tecla_evento.keycode:
+		KEY_C:
+			letra = "C"
+		KEY_G:
+			letra = "G"
+		KEY_T:
+			letra = "T"
+		_:
+			sequencia_cheat = ""
+			return
+
+	var proxima_sequencia: String = sequencia_cheat + letra
+	if "CGT".begins_with(proxima_sequencia):
+		sequencia_cheat = proxima_sequencia
+		if sequencia_cheat == "CGT":
+			sequencia_cheat = ""
+			_ativar_cheat_energia()
+	else:
+		sequencia_cheat = "C" if letra == "C" else ""
+
+func _alternar_velocidade() -> void:
+	nivel_velocidade = 1 if nivel_velocidade >= 3 else nivel_velocidade + 1
+	Engine.time_scale = float(nivel_velocidade)
+	velocidade_label.text = "%d×" % nivel_velocidade
+	_mostrar_mensagem_energia("VELOCIDADE %d×" % nivel_velocidade)
+
+func _ativar_cheat_energia() -> void:
+	player_energy += 1000
+	_atualizar_economia()
+	_mostrar_mensagem_energia("+1000 E  •  CÓDIGO CGT")
+
+func _mostrar_mensagem_energia(mensagem: String) -> void:
+	energia_ganha_em_eliminacoes = 0
+	energia_ganha_em_rodadas = 0
+	revisao_ganho_energia += 1
+	var revisao_atual: int = revisao_ganho_energia
+	ganho_energia_label.text = mensagem
+	ganho_energia_label.show()
+	_esconder_ganho_energia(revisao_atual)
+
 func _update_health_label() -> void:
 	vida_label.text = "VIDA: %d" % player_health
 
@@ -267,6 +330,7 @@ func _on_menu_play_pressed() -> void:
 	painel_rodada.hide()
 	rodada_label.hide()
 	ganho_energia_label.hide()
+	velocidade_label.hide()
 	botao_pause.hide()
 	botao_gerenciar_torres.hide()
 	instrucao_torres.text = "Escolha sua primeira torre. A rodada começa assim que você ativá-la."
@@ -281,6 +345,8 @@ func _iniciar_fase() -> void:
 	partida_iniciada = true
 	painel_rodada.show()
 	rodada_label.show()
+	velocidade_label.show()
+	velocidade_label.text = "%d×" % nivel_velocidade
 	botao_pause.show()
 	botao_pause.text = "PAUSAR"
 	botao_gerenciar_torres.show()

@@ -332,6 +332,24 @@ text = "RODADA 01"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="VelocidadeLabel" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 166.0
+offset_right = -184.0
+offset_bottom = 214.0
+mouse_filter = 2
+theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "1×"
+horizontal_alignment = 1
+vertical_alignment = 1
+
 [node name="BotaoPause" type="Button" parent="HUD"]
 visible = false
 anchors_preset = 1
