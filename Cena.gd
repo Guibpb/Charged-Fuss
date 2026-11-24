@@ -4,11 +4,26 @@ const ENEMY_SCENE = preload("res://Enemy.tscn")
 const METRICA_MAPA = preload("res://MetricaMapa.gd")
 const BASIC_TOWER_COST = 75
 const FAST_TOWER_COST = 60
+const TOTAL_RODADAS: int = 10
+const INIMIGOS_POR_RODADA: Array[int] = [3, 5, 6, 8, 9, 10, 12, 14, 15, 18]
+const ENERGIA_POR_DERROTA: int = 1
+const BONUS_RODADA: int = 10
+const INTERVALOS_RODADA: Array[float] = [1.8, 1.7, 1.6, 1.5, 1.5, 1.4, 1.4, 1.3, 1.3, 1.2]
+const TUTORIAIS_RODADA: Array[String] = [
+	"Ative uma torre para defender a rota. A rodada já começou.",
+	"Compare a torre normal com a rápida: elas têm ritmos e setores diferentes.",
+	"Cada inimigo derrotado gera energia para ativar mais torres.",
+	"Observe o setor de visão e o alcance das torres ao longo do caminho.",
+	"Combine torres com características diferentes para cobrir melhor a rota.",
+	"Você pode abrir o painel durante a partida; o jogo continuará acontecendo.",
+	"Distribua as ativações para cobrir diferentes trechos do caminho.",
+	"Mais inimigos estarão na rota ao mesmo tempo. Acompanhe o campo inteiro.",
+	"Prepare suas torres para a rodada final e guarde energia quando puder.",
+	"Última rodada: derrote o chefe, que tem três vezes a vida normal.",
+]
 
-@export var enemy_count = 20
-@export var spawn_interval: float = 1.2
 @export var enemy_vertical_offset: float = 1.12
-@export var player_health = 100
+@export var player_health: int = 50
 @export var player_energy: int = 100
 @export var path_visual_width: float = METRICA_MAPA.LARGURA_CAMINHO
 @export var path_surface_offset: float = 0.13
@@ -16,11 +31,16 @@ const FAST_TOWER_COST = 60
 @onready var caminho: Path3D = $Path3D
 @onready var vida_label: Label = $HUD/VidaLabel
 @onready var energia_label: Label = $HUD/EnergiaLabel
+@onready var ganho_energia_label: Label = $HUD/GanhoEnergiaLabel
+@onready var painel_rodada: Panel = $HUD/PainelRodada
+@onready var rodada_label: Label = $HUD/PainelRodada/RodadaLabel
 @onready var menu_inicial: Control = $HUD/MenuInicial
 @onready var menu_torres: Control = $HUD/MenuTorres
 @onready var botao_jogo: Button = $HUD/MenuTorres/Painel/Conteudo/Comecar
+@onready var instrucao_torres: Label = $HUD/MenuTorres/Painel/Conteudo/Instrucao
 @onready var status_ativacao: Label = $HUD/MenuTorres/Painel/Conteudo/Status
 @onready var botao_gerenciar_torres: Button = $HUD/GerenciarTorres
+@onready var botao_pause: Button = $HUD/BotaoPause
 @onready var botao_ativar_basica: Array[Button] = [
 	$HUD/MenuTorres/Painel/Conteudo/Torre1/Linha/AtivarBasica,
 	$HUD/MenuTorres/Painel/Conteudo/Torre2/Linha/AtivarBasica,
@@ -50,12 +70,21 @@ const FAST_TOWER_COST = 60
 
 var tipos_ativados: Array[String] = ["", "", "", ""]
 var partida_iniciada := false
+var rodada_atual: int = 0
+var inimigos_restantes: int = 0
+var spawn_em_andamento: bool = false
+var rodada_concluida: bool = false
+var fase_encerrada: bool = false
+var energia_ganha_em_eliminacoes: int = 0
+var energia_ganha_em_rodadas: int = 0
+var revisao_ganho_energia: int = 0
 
 func _ready() -> void:
 	get_tree().paused = true
 	_configurar_camera()
 	_update_health_label()
 	_atualizar_economia()
+	botao_pause.pressed.connect(_alternar_pausa)
 	botao_jogo.pressed.connect(_on_game_play_pressed)
 	botao_gerenciar_torres.pressed.connect(_on_gerenciar_torres_pressed)
 	for indice in range(torres.size()):
@@ -93,8 +122,26 @@ func _orientar_torres_para_caminho() -> void:
 		if torre_3d.has_method("definir_direcao_setor"):
 			torre_3d.call("definir_direcao_setor", direcao_setor)
 
-func spawn_queue() -> void:
-	for i in range(enemy_count):
+func _iniciar_rodada(numero_rodada: int) -> void:
+	if fase_encerrada or not partida_iniciada:
+		return
+	if numero_rodada > TOTAL_RODADAS:
+		_encerrar_fase(true)
+		return
+
+	rodada_atual = numero_rodada
+	spawn_em_andamento = true
+	rodada_concluida = false
+	instrucao_torres.text = TUTORIAIS_RODADA[rodada_atual - 1]
+
+	var quantidade_na_rodada: int = INIMIGOS_POR_RODADA[rodada_atual - 1]
+	inimigos_restantes = quantidade_na_rodada
+	_atualizar_hud_rodada()
+	for indice in range(quantidade_na_rodada):
+		if fase_encerrada or not partida_iniciada:
+			spawn_em_andamento = false
+			return
+
 		var path_follow := PathFollow3D.new()
 		path_follow.loop = false
 		path_follow.rotation_mode = PathFollow3D.ROTATION_Y
@@ -103,20 +150,112 @@ func spawn_queue() -> void:
 
 		var enemy := ENEMY_SCENE.instantiate() as CharacterBody3D
 		enemy.position.y = enemy_vertical_offset
-		enemy.connect("reached_end", _on_enemy_reached_end)
+		var eh_chefe: bool = rodada_atual == TOTAL_RODADAS and indice == quantidade_na_rodada - 1
+		if eh_chefe:
+			enemy.call("configurar_como_chefe")
+		enemy.connect("reached_end", _on_enemy_reached_end.bind(eh_chefe))
 		enemy.connect("defeated", _on_enemy_defeated)
 		path_follow.add_child(enemy)
+		_atualizar_hud_rodada()
 
-		if spawn_interval > 0.0 and i < enemy_count - 1:
-			await get_tree().create_timer(spawn_interval).timeout
+		if indice < quantidade_na_rodada - 1:
+			await get_tree().create_timer(INTERVALOS_RODADA[rodada_atual - 1], false).timeout
 
-func _on_enemy_reached_end() -> void:
-	player_health = maxi(0, player_health - 1)
+	spawn_em_andamento = false
+	_atualizar_hud_rodada()
+	_verificar_fim_rodada()
+
+func _on_enemy_reached_end(eh_chefe: bool) -> void:
+	var dano: int = 35 if eh_chefe else 1
+	player_health = maxi(0, player_health - dano)
 	_update_health_label()
+	if player_health <= 0:
+		_encerrar_fase(false)
+		return
+	_resolver_inimigo()
 
 func _on_enemy_defeated() -> void:
-	player_energy += 1
+	player_energy += ENERGIA_POR_DERROTA
+	_mostrar_ganho_energia(ENERGIA_POR_DERROTA, false)
 	_atualizar_economia()
+	_resolver_inimigo()
+
+func _mostrar_ganho_energia(quantidade: int, bonus_rodada: bool) -> void:
+	if bonus_rodada:
+		energia_ganha_em_rodadas += quantidade
+	else:
+		energia_ganha_em_eliminacoes += quantidade
+
+	revisao_ganho_energia += 1
+	var revisao_atual: int = revisao_ganho_energia
+	var texto_ganho: String = ""
+	if energia_ganha_em_eliminacoes > 0:
+		var rotulo_eliminacoes: String = "ELIMINAÇÃO" if energia_ganha_em_eliminacoes == 1 else "ELIMINAÇÕES"
+		texto_ganho = "+%d E  •  %s" % [energia_ganha_em_eliminacoes, rotulo_eliminacoes]
+	if energia_ganha_em_rodadas > 0:
+		if not texto_ganho.is_empty():
+			texto_ganho += "   |   "
+		texto_ganho += "+%d E  •  RODADA CONCLUÍDA" % energia_ganha_em_rodadas
+	ganho_energia_label.text = texto_ganho
+	ganho_energia_label.show()
+	_esconder_ganho_energia(revisao_atual)
+
+func _esconder_ganho_energia(revisao: int) -> void:
+	await get_tree().create_timer(1.8).timeout
+	if revisao == revisao_ganho_energia:
+		energia_ganha_em_eliminacoes = 0
+		energia_ganha_em_rodadas = 0
+		ganho_energia_label.hide()
+
+func _resolver_inimigo() -> void:
+	inimigos_restantes = maxi(0, inimigos_restantes - 1)
+	_atualizar_hud_rodada()
+	_verificar_fim_rodada()
+
+func _verificar_fim_rodada() -> void:
+	if fase_encerrada or spawn_em_andamento or inimigos_restantes > 0 or rodada_concluida:
+		return
+
+	rodada_concluida = true
+	player_energy += BONUS_RODADA
+	_mostrar_ganho_energia(BONUS_RODADA, true)
+	_atualizar_economia()
+	_atualizar_hud_rodada()
+	if rodada_atual >= TOTAL_RODADAS:
+		_encerrar_fase(true)
+		return
+	_aguardar_proxima_rodada(rodada_atual + 1)
+
+func _aguardar_proxima_rodada(proxima_rodada: int) -> void:
+	await get_tree().create_timer(3.0, false).timeout
+	if not fase_encerrada and partida_iniciada:
+		_iniciar_rodada(proxima_rodada)
+
+func _atualizar_hud_rodada() -> void:
+	if rodada_atual <= 0:
+		rodada_label.text = ""
+		return
+	rodada_label.text = "RODADA %02d" % rodada_atual
+
+func _encerrar_fase(vitoria: bool) -> void:
+	if fase_encerrada:
+		return
+	fase_encerrada = true
+	partida_iniciada = false
+	menu_torres.hide()
+	botao_gerenciar_torres.hide()
+	botao_pause.hide()
+	if vitoria:
+		rodada_label.text = "FASE CONCLUÍDA"
+	else:
+		rodada_label.text = "FIM DE JOGO"
+	get_tree().paused = true
+
+func _alternar_pausa() -> void:
+	if not partida_iniciada or fase_encerrada:
+		return
+	get_tree().paused = not get_tree().paused
+	botao_pause.text = "CONTINUAR" if get_tree().paused else "PAUSAR"
 
 func _update_health_label() -> void:
 	vida_label.text = "VIDA: %d" % player_health
@@ -125,7 +264,33 @@ func _on_menu_play_pressed() -> void:
 	menu_inicial.hide()
 	menu_torres.show()
 	energia_label.show()
+	painel_rodada.hide()
+	rodada_label.hide()
+	ganho_energia_label.hide()
+	botao_pause.hide()
+	botao_gerenciar_torres.hide()
+	instrucao_torres.text = "Escolha sua primeira torre. A rodada começa assim que você ativá-la."
+	status_ativacao.text = "A primeira torre inicia a partida automaticamente."
+	get_tree().paused = true
 	_atualizar_economia()
+
+func _iniciar_fase() -> void:
+	if partida_iniciada or fase_encerrada:
+		return
+	menu_torres.hide()
+	partida_iniciada = true
+	painel_rodada.show()
+	rodada_label.show()
+	botao_pause.show()
+	botao_pause.text = "PAUSAR"
+	botao_gerenciar_torres.show()
+	for torre in torres:
+		var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
+		if indicador != null:
+			indicador.hide()
+	_atualizar_economia()
+	get_tree().paused = false
+	_iniciar_rodada(1)
 
 func _on_gerenciar_torres_pressed() -> void:
 	if not partida_iniciada:
@@ -154,17 +319,17 @@ func _ativar_torre(indice: int, tipo: String) -> void:
 	var nome_tipo := "rápida" if tipo == "rapida" else "normal"
 	status_ativacao.text = "Torre %d ativada como %s por %d E." % [indice + 1, nome_tipo, custo]
 	_atualizar_economia()
+	if not partida_iniciada:
+		_iniciar_fase()
 
 func _atualizar_economia() -> void:
 	energia_label.text = "%d E" % player_energy
-	var quantidade_ativas := 0
 	for indice in range(tipos_ativados.size()):
 		var tipo := tipos_ativados[indice]
 		if tipo.is_empty():
 			status_torres[indice].text = "TORRE %02d  •  DESLIGADA" % (indice + 1)
 			status_torres[indice].add_theme_color_override("font_color", Color(0.62, 0.7, 0.74, 1))
 		else:
-			quantidade_ativas += 1
 			var nome_tipo := "rápida" if tipo == "rapida" else "normal"
 			status_torres[indice].text = "TORRE %02d  •  %s" % [indice + 1, nome_tipo.to_upper()]
 			status_torres[indice].add_theme_color_override("font_color", Color(0.4, 0.88, 0.84, 1))
@@ -174,26 +339,15 @@ func _atualizar_economia() -> void:
 	if partida_iniciada:
 		botao_jogo.text = "FECHAR PAINEL"
 		botao_jogo.disabled = false
+		botao_jogo.show()
 	else:
-		botao_jogo.text = "INICIAR PARTIDA"
-		botao_jogo.disabled = quantidade_ativas == 0
+		botao_jogo.hide()
 
 func _on_game_play_pressed() -> void:
-	if partida_iniciada:
-		menu_torres.hide()
-		botao_gerenciar_torres.show()
+	if not partida_iniciada:
 		return
-
 	menu_torres.hide()
-	for torre in torres:
-		var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
-		if indicador != null:
-			indicador.hide()
-	partida_iniciada = true
-	_atualizar_economia()
 	botao_gerenciar_torres.show()
-	get_tree().paused = false
-	spawn_queue()
 
 func _configurar_camera() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL

@@ -12,7 +12,8 @@ class SegmentoEsteira:
 	var progresso: float = 0.0
 	var posicao_x: float = 0.0
 
-var health = 40
+var health: int = 40
+var is_boss: bool = false
 
 var caminho: PathFollow3D
 var death_processed := false
@@ -42,6 +43,10 @@ func _ready():
 	caminho = get_parent() as PathFollow3D
 	_modelo_inimigo = get_node_or_null("inimigo") as Node3D
 	_preparar_esteiras()
+
+func configurar_como_chefe() -> void:
+	is_boss = true
+	health *= 3
 
 func _physics_process(delta) -> void:
 	if not is_instance_valid(caminho):

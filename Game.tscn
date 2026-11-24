@@ -273,7 +273,7 @@ theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
 theme_override_constants/outline_size = 3
 theme_override_font_sizes/font_size = 32
-text = "VIDA: 100"
+text = "VIDA: 50"
 
 [node name="EnergiaLabel" type="Label" parent="HUD" unique_id=1373993136]
 visible = false
@@ -291,12 +291,66 @@ theme_override_font_sizes/font_size = 30
 text = "100 E"
 horizontal_alignment = 2
 
+[node name="GanhoEnergiaLabel" type="Label" parent="HUD"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -384.0
+offset_top = 70.0
+offset_right = -20.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.55, 0.96, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 14
+text = "+1 E  •  INIMIGO ELIMINADO"
+horizontal_alignment = 2
+
+[node name="PainelRodada" type="Panel" parent="HUD"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -230.0
+offset_top = 102.0
+offset_right = -14.0
+offset_bottom = 158.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_energia")
+
+[node name="RodadaLabel" type="Label" parent="HUD/PainelRodada"]
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 206.0
+offset_bottom = 51.0
+theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 25
+text = "RODADA 01"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BotaoPause" type="Button" parent="HUD"]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -174.0
+offset_top = 166.0
+offset_right = -14.0
+offset_bottom = 214.0
+theme = SubResource("Theme_interface")
+theme_override_font_sizes/font_size = 16
+text = "PAUSAR"
+
 [node name="GerenciarTorres" type="Button" parent="HUD" unique_id=754939276]
 visible = false
 offset_left = 20.0
-offset_top = 80.0
+offset_top = 116.0
 offset_right = 236.0
-offset_bottom = 128.0
+offset_bottom = 164.0
 theme = SubResource("Theme_interface")
 theme_override_font_sizes/font_size = 17
 text = "GERENCIAR TORRES"
@@ -361,7 +415,7 @@ horizontal_alignment = 1
 layout_mode = 2
 theme_override_colors/font_color = Color(0.34, 0.83, 0.86, 1)
 theme_override_font_sizes/font_size = 16
-text = "DEFESA TÁTICA  /  PROTÓTIPO"
+text = "INICIAÇÃO"
 horizontal_alignment = 1
 
 [node name="Play" type="Button" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=232377009]
@@ -371,6 +425,7 @@ theme_override_font_sizes/font_size = 22
 text = "INICIAR PARTIDA"
 
 [node name="Rodape" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=179647098]
+visible = false
 layout_mode = 2
 theme_override_colors/font_color = Color(0.55, 0.67, 0.72, 1)
 theme_override_font_sizes/font_size = 13
@@ -403,9 +458,9 @@ color = Color(0.008, 0.02, 0.03, 0.34)
 custom_minimum_size = Vector2(320, 570)
 layout_mode = 1
 offset_left = 24.0
-offset_top = 72.0
+offset_top = 116.0
 offset_right = 344.0
-offset_bottom = 642.0
+offset_bottom = 686.0
 theme_override_styles/panel = SubResource("StyleBoxFlat_painel_torres")
 
 [node name="Conteudo" type="VBoxContainer" parent="HUD/MenuTorres/Painel" unique_id=1319751973]
@@ -532,7 +587,7 @@ custom_minimum_size = Vector2(280, 42)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.89, 0.75, 0.42, 1)
 theme_override_font_sizes/font_size = 15
-text = "Ative pelo menos uma torre para iniciar a defesa."
+text = "Ative uma torre para defender a rota."
 autowrap_mode = 3
 
 [node name="Comecar" type="Button" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=635226837]
