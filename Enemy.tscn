@@ -1,17 +1,10 @@
 [gd_scene format=3 uid="uid://0d51gdyonwpt"]
 
 [ext_resource type="Script" uid="uid://cmtaaqiu2h7gv" path="res://Enemy.gd" id="1_tt7e2"]
+[ext_resource type="PackedScene" uid="uid://dogre7yd2nkfd" path="res://modelos/inimigo.glb" id="2_s7bn3"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_xkndl"]
 size = Vector3(2, 2, 2)
-
-[sub_resource type="BoxMesh" id="BoxMesh_j5k5y"]
-size = Vector3(2, 2, 2)
-
-[sub_resource type="Skin" id="Skin_u44n3"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u44n3"]
-albedo_color = Color(0.12632814, 0.48487997, 0.6125, 1)
 
 [node name="Enemy" type="CharacterBody3D" unique_id=2055811584]
 script = ExtResource("1_tt7e2")
@@ -19,7 +12,4 @@ script = ExtResource("1_tt7e2")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=817290516]
 shape = SubResource("BoxShape3D_xkndl")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=100696984]
-mesh = SubResource("BoxMesh_j5k5y")
-skin = SubResource("Skin_u44n3")
-surface_material_override/0 = SubResource("StandardMaterial3D_u44n3")
+[node name="inimigo" parent="." unique_id=248619589 instance=ExtResource("2_s7bn3")]

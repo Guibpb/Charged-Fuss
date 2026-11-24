@@ -53,7 +53,7 @@ physics_material_override = SubResource("PhysicsMaterial_vtaim")
 shape = SubResource("WorldBoundaryShape3D_vtaim")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Chão/StaticBody3D" unique_id=1971918651]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.15, 0.1208331, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.8239655, 0.12083298, -0.4528885)
 mesh = SubResource("PlaneMesh_wbfu4")
 surface_material_override/0 = SubResource("StandardMaterial3D_tt7e2")
 
@@ -65,7 +65,7 @@ curve = SubResource("Curve3D_j5k5y")
 transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -4.5, 1.12, -10.234238)
 
 [node name="Identificador" type="Label3D" parent="Torre1" unique_id=653361089]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.32, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5494039, 0)
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -77,7 +77,7 @@ outline_size = 16
 transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, -16.6, 1.12, -4.1)
 
 [node name="Identificador" type="Label3D" parent="Torre2" unique_id=989446483]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.32, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5947506, 0)
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -89,7 +89,7 @@ outline_size = 16
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.6, 1.12, 2)
 
 [node name="Identificador" type="Label3D" parent="Torre3" unique_id=824776278]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.32, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5809634, 0)
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -101,7 +101,7 @@ outline_size = 16
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.6, 1.12, 9)
 
 [node name="Identificador" type="Label3D" parent="Torre4" unique_id=1900501869]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.32, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5745323, 0)
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -149,6 +149,8 @@ theme_override_font_sizes/font_size = 20
 text = "Ativar torres"
 
 [node name="MenuInicial" type="Control" parent="HUD" unique_id=106558292]
+process_mode = 3
+mouse_filter = 2
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -157,6 +159,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Fundo" type="ColorRect" parent="HUD/MenuInicial" unique_id=630437965]
+mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -166,6 +169,7 @@ grow_vertical = 2
 color = Color(0.035, 0.075, 0.09, 1)
 
 [node name="Centralizar" type="CenterContainer" parent="HUD/MenuInicial" unique_id=928555061]
+mouse_filter = 2
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -174,6 +178,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Conteudo" type="VBoxContainer" parent="HUD/MenuInicial/Centralizar" unique_id=1885110450]
+mouse_filter = 2
 layout_mode = 2
 theme_override_constants/separation = 28
 alignment = 1
@@ -192,6 +197,7 @@ theme_override_font_sizes/font_size = 30
 text = "Play"
 
 [node name="MenuTorres" type="Control" parent="HUD" unique_id=1017328288]
+process_mode = 3
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -349,3 +355,5 @@ custom_minimum_size = Vector2(280, 54)
 layout_mode = 2
 theme_override_font_sizes/font_size = 20
 text = "Começar jogo"
+
+[connection signal="pressed" from="HUD/MenuInicial/Centralizar/Conteudo/Play" to="." method="_on_menu_play_pressed"]

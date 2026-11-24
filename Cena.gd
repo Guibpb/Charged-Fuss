@@ -56,7 +56,6 @@ func _ready() -> void:
 	_configurar_camera()
 	_update_health_label()
 	_atualizar_economia()
-	$HUD/MenuInicial/Centralizar/Conteudo/Play.pressed.connect(_on_menu_play_pressed)
 	botao_jogo.pressed.connect(_on_game_play_pressed)
 	botao_gerenciar_torres.pressed.connect(_on_gerenciar_torres_pressed)
 	for indice in range(torres.size()):
@@ -98,7 +97,8 @@ func spawn_queue() -> void:
 	for i in range(enemy_count):
 		var path_follow := PathFollow3D.new()
 		path_follow.loop = false
-		path_follow.rotation_mode = PathFollow3D.ROTATION_NONE
+		path_follow.rotation_mode = PathFollow3D.ROTATION_Y
+		path_follow.use_model_front = true
 		caminho.add_child(path_follow)
 
 		var enemy := ENEMY_SCENE.instantiate() as CharacterBody3D
