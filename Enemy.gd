@@ -5,7 +5,7 @@ const BOSS_MODEL_SCENE: PackedScene = preload("res://modelos/boss3.glb")
 signal reached_end
 signal defeated
 
-@export var speed = 4
+@export var speed: float = 5.0
 @export var gravity = 9.8
 
 class SegmentoEsteira:

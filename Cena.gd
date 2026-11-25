@@ -5,10 +5,10 @@ const METRICA_MAPA = preload("res://MetricaMapa.gd")
 const BASIC_TOWER_COST = 75
 const FAST_TOWER_COST = 60
 const TOTAL_RODADAS: int = 10
-const INIMIGOS_POR_RODADA: Array[int] = [3, 5, 6, 8, 9, 10, 12, 14, 15, 18]
+const INIMIGOS_POR_RODADA: Array[int] = [5, 5, 15, 15, 25, 30, 35, 40, 50, 50]
 const ENERGIA_POR_DERROTA: int = 1
 const BONUS_RODADA: int = 10
-const INTERVALOS_RODADA: Array[float] = [1.8, 1.7, 1.6, 1.5, 1.5, 1.4, 1.4, 1.3, 1.3, 1.2]
+const INTERVALOS_RODADA: Array[float] = [1.5, 1.5, 1.5, 0.8, 1.0, 1.5, 1.0, 0.8, 1.0, 1.0]
 const TUTORIAIS_RODADA: Array[String] = [
 	"Ative uma torre para defender a rota. A rodada já começou.",
 	"Compare a torre normal com a rápida: elas têm ritmos e setores diferentes.",
@@ -68,6 +68,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 ]
 @onready var camera: Camera3D = $Camera3D
 @onready var malha_chao: MeshInstance3D = $Chão/StaticBody3D/MeshInstance3D
+@onready var tela_derrota: Control = $HUD/TelaDerrota
 
 var tipos_ativados: Array[String] = ["", "", "", ""]
 var partida_iniciada := false
@@ -150,9 +151,10 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 	instrucao_torres.text = TUTORIAIS_RODADA[rodada_atual - 1]
 
 	var quantidade_na_rodada: int = INIMIGOS_POR_RODADA[rodada_atual - 1]
-	inimigos_restantes = quantidade_na_rodada
+	var total_de_spawns: int = quantidade_na_rodada + (1 if rodada_atual == TOTAL_RODADAS else 0)
+	inimigos_restantes = total_de_spawns
 	_atualizar_hud_rodada()
-	for indice in range(quantidade_na_rodada):
+	for indice in range(total_de_spawns):
 		if revisao_atual != revisao_fluxo_rodadas:
 			return
 		if fase_encerrada or not partida_iniciada:
@@ -167,7 +169,7 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 
 		var enemy := ENEMY_SCENE.instantiate() as CharacterBody3D
 		enemy.position.y = enemy_vertical_offset
-		var eh_chefe: bool = rodada_atual == TOTAL_RODADAS and indice == quantidade_na_rodada - 1
+		var eh_chefe: bool = rodada_atual == TOTAL_RODADAS and indice == quantidade_na_rodada
 		if eh_chefe:
 			enemy.call("configurar_como_chefe")
 		enemy.connect("reached_end", _on_enemy_reached_end.bind(eh_chefe))
@@ -175,7 +177,7 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 		path_follow.add_child(enemy)
 		_atualizar_hud_rodada()
 
-		if indice < quantidade_na_rodada - 1:
+		if indice < total_de_spawns - 1:
 			await get_tree().create_timer(INTERVALOS_RODADA[rodada_atual - 1], false).timeout
 			if revisao_atual != revisao_fluxo_rodadas:
 				return
@@ -264,6 +266,8 @@ func _encerrar_fase(vitoria: bool) -> void:
 		return
 	fase_encerrada = true
 	partida_iniciada = false
+	revisao_fluxo_rodadas += 1
+	spawn_em_andamento = false
 	menu_torres.hide()
 	botao_gerenciar_torres.hide()
 	botao_pause.hide()
@@ -274,6 +278,7 @@ func _encerrar_fase(vitoria: bool) -> void:
 		rodada_label.text = "FASE CONCLUÍDA"
 	else:
 		rodada_label.text = "FIM DE JOGO"
+		tela_derrota.show()
 	get_tree().paused = true
 
 func _alternar_pausa() -> void:
