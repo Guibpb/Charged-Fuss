@@ -1,0 +1,617 @@
+[gd_scene format=3 uid="uid://bsuacu2e8cb2y"]
+
+[ext_resource type="Script" uid="uid://cake722v5sjk4" path="res://Cena.gd" id="1_u44n3"]
+[ext_resource type="PackedScene" uid="uid://makero5ca6aw" path="res://TorreBasica.tscn" id="2_torre"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vtaim"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_vtaim"]
+margin = 2.858
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wbfu4"]
+size = Vector2(54.5, 30.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tt7e2"]
+albedo_color = Color(0.18, 0.2, 0.23, 1)
+metallic = 0.25
+roughness = 0.65
+
+[sub_resource type="Curve3D" id="Curve3D_j5k5y"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 1.275, 9.1, -0.35878247, -10.8375, 0, 0, -1.275, -1.6, 0, 0, 9.1, -0.35878247, -7.0125, 1.6, 0, 0, 0, 0, 1.275, -9.1, -0.35878247, -7.0125, 0, 0, -1.275, 1.6, 0, 0, -9.1, -0.35878247, -1.275, -1.6, 0, 0, 0, 0, 1.275, 9.1, -0.35878247, -1.275, 0, 0, -1.275, -1.6, 0, 0, 9.1, -0.35878247, 5.1, 1.6, 0, 0, 0, 0, 1.275, -9.1, -0.35878247, 5.1, 0, 0, -1.275, 0, 0, 0, -9.1, -0.35878247, 10.8375),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill_vida"]
+bg_color = Color(0.035, 0.065, 0.085, 0.94)
+border_width_left = 3
+border_color = Color(0.95, 0.2, 0.25, 1)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_pill_energia"]
+bg_color = Color(0.035, 0.065, 0.085, 0.94)
+border_width_right = 3
+border_color = Color(0.18, 0.83, 0.88, 1)
+corner_radius_top_left = 11
+corner_radius_top_right = 11
+corner_radius_bottom_right = 11
+corner_radius_bottom_left = 11
+shadow_color = Color(0, 0, 0, 0.28)
+shadow_size = 8
+shadow_offset = Vector2(0, 3)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_disabled"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.045, 0.075, 0.09, 0.95)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12, 0.2, 0.23, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_hover"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.11, 0.24, 0.28, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.25, 0.82, 0.82, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_normal"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.075, 0.13, 0.16, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.18, 0.34, 0.39, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_pressed"]
+content_margin_left = 18.0
+content_margin_top = 10.0
+content_margin_right = 18.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.43, 0.48, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.35, 0.92, 0.88, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="Theme" id="Theme_interface"]
+default_font_size = 16
+Button/colors/font_color = Color(0.88, 0.94, 0.97, 1)
+Button/colors/font_disabled_color = Color(0.49, 0.59, 0.63, 1)
+Button/colors/font_hover_color = Color(0.96, 1, 1, 1)
+Button/colors/font_pressed_color = Color(1, 1, 1, 1)
+Button/styles/disabled = SubResource("StyleBoxFlat_botao_disabled")
+Button/styles/focus = SubResource("StyleBoxFlat_botao_hover")
+Button/styles/hover = SubResource("StyleBoxFlat_botao_hover")
+Button/styles/normal = SubResource("StyleBoxFlat_botao_normal")
+Button/styles/pressed = SubResource("StyleBoxFlat_botao_pressed")
+Label/colors/font_color = Color(0.88, 0.93, 0.96, 1)
+Label/colors/font_disabled_color = Color(0.54, 0.63, 0.67, 1)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_cartao_inicio"]
+content_margin_left = 36.0
+content_margin_top = 30.0
+content_margin_right = 36.0
+content_margin_bottom = 30.0
+bg_color = Color(0.035, 0.065, 0.085, 0.96)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.12, 0.68, 0.72, 0.72)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.42)
+shadow_size = 22
+shadow_offset = Vector2(0, 10)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_painel_torres"]
+content_margin_left = 16.0
+content_margin_top = 14.0
+content_margin_right = 16.0
+content_margin_bottom = 14.0
+bg_color = Color(0.035, 0.065, 0.085, 0.97)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.16, 0.45, 0.52, 0.8)
+corner_radius_top_left = 14
+corner_radius_top_right = 14
+corner_radius_bottom_right = 14
+corner_radius_bottom_left = 14
+shadow_color = Color(0, 0, 0, 0.35)
+shadow_size = 12
+shadow_offset = Vector2(0, 5)
+
+[node name="Game" type="Node3D" unique_id=1938844436]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.50910604, 0)
+script = ExtResource("1_u44n3")
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=867802795]
+transform = Transform3D(-0.18232116, 0.6190583, -0.76388866, 0, 0.7769104, 0.6296112, 0.98323905, 0.114791445, -0.1416472, -7.8631897, 6.493578, 4.7095504)
+current = true
+fov = 70.3125
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1444622644]
+transform = Transform3D(0.9221972, -0.3454078, -0.17391308, -0.068022035, -0.58758307, 0.8062997, -0.38069057, -0.7317374, -0.5653629, -0.7800604, 7.3317523, -8.101334)
+light_energy = 1.475
+shadow_enabled = true
+
+[node name="Chão" type="Node3D" parent="." unique_id=180397138]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Chão" unique_id=1775617526]
+physics_material_override = SubResource("PhysicsMaterial_vtaim")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Chão/StaticBody3D" unique_id=64052463]
+shape = SubResource("WorldBoundaryShape3D_vtaim")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Chão/StaticBody3D" unique_id=1971918651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.8239655, 0.12083298, -0.4528885)
+mesh = SubResource("PlaneMesh_wbfu4")
+surface_material_override/0 = SubResource("StandardMaterial3D_tt7e2")
+
+[node name="Path3D" type="Path3D" parent="." unique_id=416347350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.35878283, 0)
+curve = SubResource("Curve3D_j5k5y")
+
+[node name="Torre1" parent="." unique_id=1779074686 instance=ExtResource("2_torre")]
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -4.5, 1.12, -10.234238)
+
+[node name="Identificador" type="Label3D" parent="Torre1" unique_id=653361089]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5494039, 0)
+pixel_size = 0.007
+billboard = 1
+outline_modulate = Color(0.035, 0.055, 0.07, 1)
+text = "1"
+font_size = 96
+outline_size = 16
+
+[node name="Torre2" parent="." unique_id=188372118 instance=ExtResource("2_torre")]
+transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, -16.6, 1.12, -4.1)
+
+[node name="Identificador" type="Label3D" parent="Torre2" unique_id=989446483]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5947506, 0)
+pixel_size = 0.007
+billboard = 1
+outline_modulate = Color(0.035, 0.055, 0.07, 1)
+text = "2"
+font_size = 96
+outline_size = 16
+
+[node name="Torre3" parent="." unique_id=289167391 instance=ExtResource("2_torre")]
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.6, 1.12, 2)
+
+[node name="Identificador" type="Label3D" parent="Torre3" unique_id=824776278]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5809634, 0)
+pixel_size = 0.007
+billboard = 1
+outline_modulate = Color(0.035, 0.055, 0.07, 1)
+text = "3"
+font_size = 96
+outline_size = 16
+
+[node name="Torre4" parent="." unique_id=101451922 instance=ExtResource("2_torre")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.6, 1.12, 9)
+
+[node name="Identificador" type="Label3D" parent="Torre4" unique_id=1900501869]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5745323, 0)
+pixel_size = 0.007
+billboard = 1
+outline_modulate = Color(0.035, 0.055, 0.07, 1)
+text = "4"
+font_size = 96
+outline_size = 16
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=922765045]
+process_mode = 3
+
+[node name="VidaPainel" type="Panel" parent="HUD" unique_id=1710347492]
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 292.0
+offset_bottom = 72.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_vida")
+
+[node name="EnergiaPainel" type="Panel" parent="HUD" unique_id=1008499494]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -214.0
+offset_top = 14.0
+offset_right = -14.0
+offset_bottom = 68.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_energia")
+
+[node name="VidaLabel" type="Label" parent="HUD" unique_id=1998607069]
+offset_left = 28.0
+offset_top = 21.0
+offset_right = 284.0
+offset_bottom = 64.0
+theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
+theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 32
+text = "VIDA: 50"
+
+[node name="EnergiaLabel" type="Label" parent="HUD" unique_id=1373993136]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -202.0
+offset_top = 20.0
+offset_right = -24.0
+offset_bottom = 58.0
+theme_override_colors/font_color = Color(0.35, 0.95, 1, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 30
+text = "100 E"
+horizontal_alignment = 2
+
+[node name="GanhoEnergiaLabel" type="Label" parent="HUD" unique_id=1708399119]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -384.0
+offset_top = 70.0
+offset_right = -20.0
+offset_bottom = 98.0
+theme_override_colors/font_color = Color(0.55, 0.96, 0.68, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 14
+text = "+1 E  •  INIMIGO ELIMINADO"
+horizontal_alignment = 2
+
+[node name="PainelRodada" type="Panel" parent="HUD" unique_id=1889254331]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -230.0
+offset_top = 102.0
+offset_right = -14.0
+offset_bottom = 158.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_pill_energia")
+
+[node name="RodadaLabel" type="Label" parent="HUD/PainelRodada" unique_id=1851848630]
+layout_mode = 0
+offset_left = 10.0
+offset_top = 5.0
+offset_right = 206.0
+offset_bottom = 51.0
+theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 25
+text = "RODADA 01"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VelocidadeLabel" type="Label" parent="HUD" unique_id=333546561]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 166.0
+offset_right = -184.0
+offset_bottom = 214.0
+theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
+theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 20
+text = "1×"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BotaoPause" type="Button" parent="HUD" unique_id=571203683]
+visible = false
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -174.0
+offset_top = 166.0
+offset_right = -14.0
+offset_bottom = 214.0
+theme = SubResource("Theme_interface")
+theme_override_font_sizes/font_size = 16
+text = "PAUSAR"
+
+[node name="GerenciarTorres" type="Button" parent="HUD" unique_id=754939276]
+visible = false
+offset_left = 20.0
+offset_top = 116.0
+offset_right = 236.0
+offset_bottom = 164.0
+theme = SubResource("Theme_interface")
+theme_override_font_sizes/font_size = 17
+text = "GERENCIAR TORRES"
+
+[node name="MenuInicial" type="Control" parent="HUD" unique_id=106558292]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_interface")
+
+[node name="Fundo" type="ColorRect" parent="HUD/MenuInicial" unique_id=630437965]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.018, 0.035, 0.052, 1)
+
+[node name="CartaoInicio" type="Panel" parent="HUD/MenuInicial" unique_id=539697308]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -220.0
+offset_right = 320.0
+offset_bottom = 220.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_cartao_inicio")
+
+[node name="Centralizar" type="CenterContainer" parent="HUD/MenuInicial" unique_id=928555061]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Conteudo" type="VBoxContainer" parent="HUD/MenuInicial/Centralizar" unique_id=1885110450]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
+alignment = 1
+
+[node name="Titulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=398344981]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.91, 0.96, 0.92, 1)
+theme_override_font_sizes/font_size = 58
+text = "Tower Defense"
+horizontal_alignment = 1
+
+[node name="Subtitulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=2137112215]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.34, 0.83, 0.86, 1)
+theme_override_font_sizes/font_size = 16
+text = "INICIAÇÃO"
+horizontal_alignment = 1
+
+[node name="Play" type="Button" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=232377009]
+custom_minimum_size = Vector2(270, 64)
+layout_mode = 2
+theme_override_font_sizes/font_size = 22
+text = "INICIAR PARTIDA"
+
+[node name="Rodape" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=179647098]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0.55, 0.67, 0.72, 1)
+theme_override_font_sizes/font_size = 13
+text = "QUATRO TORRES  •  ENERGIA  •  ROTA ATIVA"
+horizontal_alignment = 1
+
+[node name="MenuTorres" type="Control" parent="HUD" unique_id=1017328288]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_interface")
+
+[node name="Fundo" type="ColorRect" parent="HUD/MenuTorres" unique_id=1121561100]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.008, 0.02, 0.03, 0.34)
+
+[node name="Painel" type="PanelContainer" parent="HUD/MenuTorres" unique_id=845338185]
+custom_minimum_size = Vector2(320, 570)
+layout_mode = 1
+offset_left = 24.0
+offset_top = 116.0
+offset_right = 344.0
+offset_bottom = 686.0
+theme_override_styles/panel = SubResource("StyleBoxFlat_painel_torres")
+
+[node name="Conteudo" type="VBoxContainer" parent="HUD/MenuTorres/Painel" unique_id=1319751973]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Titulo" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=818158494]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.45, 0.9, 0.91, 1)
+theme_override_font_sizes/font_size = 21
+text = "ATIVAÇÃO DAS TORRES"
+horizontal_alignment = 1
+
+[node name="Instrucao" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=7650161]
+custom_minimum_size = Vector2(280, 54)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.67, 0.76, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Ative as torres com energia. As desligadas não atacam."
+autowrap_mode = 3
+
+[node name="Torre1" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1131273396]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre1" unique_id=933068958]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Torre 1 — desligada"
+
+[node name="Linha" type="HBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo/Torre1" unique_id=525743166]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre1/Linha" unique_id=425131518]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Normal · 75 E"
+
+[node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre1/Linha" unique_id=374466045]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Rápida · 60 E"
+
+[node name="Torre2" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=594859940]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre2" unique_id=831717780]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Torre 2 — desligada"
+
+[node name="Linha" type="HBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo/Torre2" unique_id=13245251]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre2/Linha" unique_id=1690856512]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Normal · 75 E"
+
+[node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre2/Linha" unique_id=1632738381]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Rápida · 60 E"
+
+[node name="Torre3" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=225011041]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre3" unique_id=1422681591]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Torre 3 — desligada"
+
+[node name="Linha" type="HBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo/Torre3" unique_id=924571255]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre3/Linha" unique_id=1331246307]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Normal · 75 E"
+
+[node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre3/Linha" unique_id=720651714]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Rápida · 60 E"
+
+[node name="Torre4" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1878550307]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre4" unique_id=307659186]
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Torre 4 — desligada"
+
+[node name="Linha" type="HBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo/Torre4" unique_id=2024396570]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre4/Linha" unique_id=63946675]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Normal · 75 E"
+
+[node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre4/Linha" unique_id=921566877]
+custom_minimum_size = Vector2(130, 44)
+layout_mode = 2
+theme_override_font_sizes/font_size = 16
+text = "Rápida · 60 E"
+
+[node name="Status" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=853670083]
+custom_minimum_size = Vector2(280, 42)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.89, 0.75, 0.42, 1)
+theme_override_font_sizes/font_size = 15
+text = "Ative uma torre para defender a rota."
+autowrap_mode = 3
+
+[node name="Comecar" type="Button" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=635226837]
+custom_minimum_size = Vector2(280, 56)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "INICIAR PARTIDA"
+
+[connection signal="pressed" from="HUD/MenuInicial/Centralizar/Conteudo/Play" to="." method="_on_menu_play_pressed"]

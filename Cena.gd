@@ -22,7 +22,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 	"Última rodada: derrote o chefe, que tem três vezes a vida normal.",
 ]
 
-@export var enemy_vertical_offset: float = 1.12
+@export var enemy_vertical_offset: float = 0.2
 @export var player_health: int = 50
 @export var player_energy: int = 100
 @export var path_visual_width: float = METRICA_MAPA.LARGURA_CAMINHO
@@ -81,6 +81,7 @@ var energia_ganha_em_rodadas: int = 0
 var revisao_ganho_energia: int = 0
 var nivel_velocidade: int = 1
 var sequencia_cheat: String = ""
+var revisao_fluxo_rodadas: int = 0
 
 func _ready() -> void:
 	Engine.time_scale = 1.0
@@ -134,6 +135,9 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 		_encerrar_fase(true)
 		return
 
+	revisao_fluxo_rodadas += 1
+	var revisao_atual: int = revisao_fluxo_rodadas
+
 	rodada_atual = numero_rodada
 	spawn_em_andamento = true
 	rodada_concluida = false
@@ -143,6 +147,8 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 	inimigos_restantes = quantidade_na_rodada
 	_atualizar_hud_rodada()
 	for indice in range(quantidade_na_rodada):
+		if revisao_atual != revisao_fluxo_rodadas:
+			return
 		if fase_encerrada or not partida_iniciada:
 			spawn_em_andamento = false
 			return
@@ -165,7 +171,11 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 
 		if indice < quantidade_na_rodada - 1:
 			await get_tree().create_timer(INTERVALOS_RODADA[rodada_atual - 1], false).timeout
+			if revisao_atual != revisao_fluxo_rodadas:
+				return
 
+	if revisao_atual != revisao_fluxo_rodadas:
+		return
 	spawn_em_andamento = false
 	_atualizar_hud_rodada()
 	_verificar_fim_rodada()
@@ -232,8 +242,9 @@ func _verificar_fim_rodada() -> void:
 	_aguardar_proxima_rodada(rodada_atual + 1)
 
 func _aguardar_proxima_rodada(proxima_rodada: int) -> void:
+	var revisao_atual: int = revisao_fluxo_rodadas
 	await get_tree().create_timer(3.0, false).timeout
-	if not fase_encerrada and partida_iniciada:
+	if revisao_atual == revisao_fluxo_rodadas and not fase_encerrada and partida_iniciada:
 		_iniciar_rodada(proxima_rodada)
 
 func _atualizar_hud_rodada() -> void:
@@ -273,6 +284,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		sequencia_cheat = ""
 		return
 
+	if tecla_evento.keycode == KEY_B:
+		sequencia_cheat = ""
+		if partida_iniciada:
+			_pular_para_rodada_final()
+		return
+
 	if tecla_evento.keycode == KEY_V:
 		sequencia_cheat = ""
 		if partida_iniciada:
@@ -310,6 +327,20 @@ func _ativar_cheat_energia() -> void:
 	player_energy += 1000
 	_atualizar_economia()
 	_mostrar_mensagem_energia("+1000 E  •  CÓDIGO CGT")
+
+func _pular_para_rodada_final() -> void:
+	if not partida_iniciada or fase_encerrada or rodada_atual >= TOTAL_RODADAS:
+		return
+
+	for filho in caminho.get_children():
+		if filho is PathFollow3D:
+			filho.queue_free()
+
+	inimigos_restantes = 0
+	spawn_em_andamento = false
+	rodada_concluida = false
+	_mostrar_mensagem_energia("CÓDIGO B  •  RODADA FINAL")
+	_iniciar_rodada(TOTAL_RODADAS)
 
 func _mostrar_mensagem_energia(mensagem: String) -> void:
 	energia_ganha_em_eliminacoes = 0
@@ -424,12 +455,15 @@ func _configurar_camera() -> void:
 	camera.size = tamanho_efetivo.y
 	var largura_view := tamanho_efetivo.x / (1.0 - METRICA_MAPA.FRACAO_CONTROLES)
 	var largura_controles := largura_view * METRICA_MAPA.FRACAO_CONTROLES
-	var centro_mapa := Vector3(-largura_controles * 0.5, malha_chao.global_position.y, 0.0)
-	camera.global_position = centro_mapa + Vector3(0.0, 34.0, 8.0)
+	var deslocamento_camera := Vector3(13.0, 20.0, 18.0)
+	var eixo_direita_camera := Vector3(deslocamento_camera.z, 0.0, -deslocamento_camera.x).normalized()
+	var centro_mapa := Vector3(-largura_controles * 0.5, malha_chao.global_position.y, 0.0) - eixo_direita_camera * 4.0
+	camera.global_position = centro_mapa + deslocamento_camera
 	camera.look_at(centro_mapa, Vector3.UP)
 	var plano := malha_chao.mesh as PlaneMesh
 	if plano != null:
-		plano.size = Vector2(largura_view + 1.0, camera.size / cos(atan2(8.0, 34.0)) + 1.0)
+		var tamanho_chao := maxf(largura_view, camera.size) * 4.0
+		plano.size = Vector2(tamanho_chao, tamanho_chao)
 	malha_chao.global_position = Vector3(centro_mapa.x, malha_chao.global_position.y, centro_mapa.z)
 
 func _criar_visual_do_caminho() -> void:

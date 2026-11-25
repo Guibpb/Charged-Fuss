@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const BOSS_MODEL_SCENE: PackedScene = preload("res://modelos/boss3.glb")
+
 signal reached_end
 signal defeated
 
@@ -41,12 +43,27 @@ var _pontos_percurso_esteira: Array[Vector2] = [
 func _ready():
 	add_to_group("inimigos")
 	caminho = get_parent() as PathFollow3D
-	_modelo_inimigo = get_node_or_null("inimigo") as Node3D
-	_preparar_esteiras()
+	_modelo_inimigo = get_node_or_null("boss" if is_boss else "inimigo") as Node3D
+	if not is_boss and _modelo_inimigo != null:
+		_modelo_inimigo.scale = Vector3.ONE * 1.25
+		_preparar_esteiras()
 
 func configurar_como_chefe() -> void:
 	is_boss = true
 	health *= 3
+	var modelo_normal := get_node_or_null("inimigo")
+	if modelo_normal != null:
+		remove_child(modelo_normal)
+		modelo_normal.queue_free()
+
+	var modelo_chefe := BOSS_MODEL_SCENE.instantiate() as Node3D
+	if modelo_chefe == null:
+		push_error("O modelo modelos/boss.glb precisa ter um nó raiz Node3D.")
+		return
+	modelo_chefe.name = "boss"
+	modelo_chefe.scale = Vector3.ONE * 1.15
+	modelo_chefe.position.y = 0.12
+	add_child(modelo_chefe)
 
 func _physics_process(delta) -> void:
 	if not is_instance_valid(caminho):
