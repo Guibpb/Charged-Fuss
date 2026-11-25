@@ -17,4 +17,5 @@ script = ExtResource("1_script")
 shape = SubResource("SphereShape3D_projectile")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+cast_shadow = 0
 mesh = SubResource("SphereMesh_projectile")

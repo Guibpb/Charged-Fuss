@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Tower-Defense"
 run/main_scene="uid://bsuacu2e8cb2y"
-config/features=PackedStringArray("4.7", "Forward Plus")
+config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
 
 [display]
@@ -30,9 +30,12 @@ theme/custom="res://OrbitronTheme.tres"
 
 [physics]
 
+common/physics_interpolation=true
 3d/physics_engine="Jolt Physics"
 
 [rendering]
 
-rendering_device/driver.windows="d3d12"
-anti_aliasing/quality/msaa_3d=2
+renderer/rendering_method="gl_compatibility"
+scaling_3d/scale=0.8333333
+anti_aliasing/quality/msaa_3d=1
+lights_and_shadows/directional_shadow/size=2048
