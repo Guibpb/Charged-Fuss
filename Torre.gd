@@ -1,6 +1,6 @@
 extends CharacterBody3D
 
-@export var shot_range: float = 4.5
+@export var shot_range: float = 5.5
 @export var sector_angle_degrees: float = 100.0
 @export var shot_interval: float = 1.0
 @export var damage: int = 25
@@ -10,22 +10,60 @@ var active := false
 var shot_timer := 0.0
 var velocidade_rotacao: float = 20.0
 var direcao_setor_global: Vector3 = Vector3(0.0, 0.0, -1.0)
+var parte_superior_rotativa: Node3D
+var ponto_disparo: Node3D
+
+const ALTURA_EIXO_MODELO: float = 0.95
+const ALTURA_TOTAL_MODELO: float = 2.94
+const COMPRIMENTO_CANHAO_MODELO: float = 2.8
+const DESLOCAMENTO_FRENTE_MODELO: float = PI * 0.5
 
 func _ready() -> void:
 	add_to_group("torres")
 	set_physics_process(false)
+	_preparar_modelo_torre()
 	_atualizar_cor(Color(0.34, 0.37, 0.39, 1.0))
+
+func _preparar_modelo_torre() -> void:
+	var modelo := get_node_or_null("Modelo") as Node3D
+	if modelo == null:
+		return
+
+	var escala_modelo := absf(modelo.scale.x)
+	var pivo := Node3D.new()
+	pivo.name = "ParteSuperiorRotativa"
+	add_child(pivo)
+	pivo.position.y = -1.12 + ALTURA_EIXO_MODELO * escala_modelo
+	parte_superior_rotativa = pivo
+
+	for parte in modelo.find_children("*", "MeshInstance3D", true, false):
+		var nome_parte := String(parte.name).to_lower().replace(".", "").replace("_", "")
+		var visual_parte := parte as MeshInstance3D
+		if visual_parte.mesh != null:
+			nome_parte += String(visual_parte.mesh.resource_name).to_lower().replace(".", "").replace("_", "")
+		if nome_parte.contains("gun") or nome_parte.contains("baseturret"):
+			visual_parte.reparent(pivo, true)
+
+	var marcador := Node3D.new()
+	marcador.name = "PontoDisparo"
+	pivo.add_child(marcador)
+	marcador.position = Vector3(
+		COMPRIMENTO_CANHAO_MODELO * escala_modelo,
+		(ALTURA_TOTAL_MODELO - ALTURA_EIXO_MODELO) * escala_modelo,
+		0.0
+	)
+	ponto_disparo = marcador
 
 func ativar(rapida: bool) -> void:
 	active = true
 	if rapida:
-		shot_range = 3.5
+		shot_range = 4.5
 		sector_angle_degrees = 60.0
 		shot_interval = 0.2
 		damage = 10
 		_atualizar_cor(Color(1.0, 0.56, 0.2, 1.0))
 	else:
-		shot_range = 4.5
+		shot_range = 5.5
 		sector_angle_degrees = 100.0
 		shot_interval = 0.8
 		damage = 25
@@ -41,6 +79,8 @@ func definir_direcao_setor(direcao: Vector3) -> void:
 	direcao_setor_global = direcao.normalized()
 	var yaw := atan2(-direcao_setor_global.x, -direcao_setor_global.z)
 	global_rotation.y = yaw
+	if parte_superior_rotativa != null:
+		parte_superior_rotativa.global_rotation.y = yaw + DESLOCAMENTO_FRENTE_MODELO
 
 func _physics_process(delta: float) -> void:
 	if not active:
@@ -58,9 +98,23 @@ func _physics_process(delta: float) -> void:
 	if direcao_alvo.length_squared() < 0.0001:
 		return
 	var yaw_alvo := atan2(-direcao_alvo.x, -direcao_alvo.z)
-	global_rotation.y = rotate_toward(global_rotation.y, yaw_alvo, velocidade_rotacao * delta)
-	var erro_angular := absf(wrapf(yaw_alvo - global_rotation.y, -PI, PI))
-	if shot_timer <= 0.0 and erro_angular <= deg_to_rad(3.0):
+	if parte_superior_rotativa != null:
+		var yaw_modelo_alvo := yaw_alvo + DESLOCAMENTO_FRENTE_MODELO
+		var diferenca_angular_modelo := wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI)
+		parte_superior_rotativa.global_rotation.y += clampf(
+			diferenca_angular_modelo,
+			-velocidade_rotacao * delta,
+			velocidade_rotacao * delta
+		)
+		var erro_angular_modelo := absf(wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI))
+		if shot_timer <= 0.0 and erro_angular_modelo <= deg_to_rad(3.0):
+			_atirar_no_alvo(alvo)
+		return
+
+	var diferenca_angular_base := wrapf(yaw_alvo - global_rotation.y, -PI, PI)
+	global_rotation.y += clampf(diferenca_angular_base, -velocidade_rotacao * delta, velocidade_rotacao * delta)
+	var erro_angular_base := absf(wrapf(yaw_alvo - global_rotation.y, -PI, PI))
+	if shot_timer <= 0.0 and erro_angular_base <= deg_to_rad(3.0):
 		_atirar_no_alvo(alvo)
 
 func _encontrar_alvo_no_setor() -> Node3D:
@@ -88,18 +142,28 @@ func _encontrar_alvo_no_setor() -> Node3D:
 
 
 func _atirar_no_alvo(target: Node3D) -> void:
-	var direction: Vector3 = (target.global_position - global_position).normalized()
+	var origem := global_position + Vector3.UP * 0.2
+	if ponto_disparo != null:
+		origem = ponto_disparo.global_position
+	var direction: Vector3 = (target.global_position - origem).normalized()
 	var projectile = projectile_scene.instantiate()
 	projectile.shooter = self
 	projectile.damage = damage
 	get_tree().current_scene.add_child(projectile)
-	projectile.global_position = global_position + direction * 1.2 + Vector3.UP * 0.2
+	projectile.global_position = origem
 	projectile.direction = direction
 	shot_timer = shot_interval
 
 func _atualizar_cor(cor: Color) -> void:
 	var visual := get_node_or_null("MeshInstance3D") as MeshInstance3D
 	if visual == null:
+		for parte in find_children("*", "MeshInstance3D", true, false):
+			if not String(parte.name).to_lower().contains("neon"):
+				continue
+			var material_neon := StandardMaterial3D.new()
+			material_neon.albedo_color = cor
+			material_neon.roughness = 0.35
+			(parte as MeshInstance3D).material_override = material_neon
 		return
 	var material := StandardMaterial3D.new()
 	material.albedo_color = cor

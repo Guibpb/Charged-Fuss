@@ -82,6 +82,7 @@ var revisao_ganho_energia: int = 0
 var nivel_velocidade: int = 1
 var sequencia_cheat: String = ""
 var revisao_fluxo_rodadas: int = 0
+var torre_com_alcance_selecionada: Node3D = null
 
 func _ready() -> void:
 	Engine.time_scale = 1.0
@@ -96,6 +97,11 @@ func _ready() -> void:
 	for indice in range(torres.size()):
 		botao_ativar_basica[indice].pressed.connect(_ativar_torre.bind(indice, "basica"))
 		botao_ativar_rapida[indice].pressed.connect(_ativar_torre.bind(indice, "rapida"))
+		var torre_clicavel := torres[indice] as CollisionObject3D
+		if torre_clicavel != null:
+			torre_clicavel.input_ray_pickable = true
+			torre_clicavel.input_event.connect(_ao_clicar_torre.bind(indice))
+	get_viewport().physics_object_picking = true
 
 	if caminho.curve == null or caminho.curve.get_baked_length() <= 0.0:
 		push_error("O Path3D precisa ter uma curva com pelo menos dois pontos.")
@@ -372,6 +378,7 @@ func _on_menu_play_pressed() -> void:
 func _iniciar_fase() -> void:
 	if partida_iniciada or fase_encerrada:
 		return
+	_orientar_torres_para_caminho()
 	menu_torres.hide()
 	partida_iniciada = true
 	painel_rodada.show()
@@ -381,10 +388,7 @@ func _iniciar_fase() -> void:
 	botao_pause.show()
 	botao_pause.text = "PAUSAR"
 	botao_gerenciar_torres.show()
-	for torre in torres:
-		var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
-		if indicador != null:
-			indicador.hide()
+	_ocultar_alcances_torres()
 	_atualizar_economia()
 	get_tree().paused = false
 	_iniciar_rodada(1)
@@ -408,16 +412,48 @@ func _ativar_torre(indice: int, tipo: String) -> void:
 	torres[indice].call("ativar", tipo == "rapida")
 	player_energy -= custo
 	tipos_ativados[indice] = tipo
-	if partida_iniciada:
-		var indicador := torres[indice].get_node_or_null("IndicadorAlcance") as MeshInstance3D
-		if indicador != null:
-			indicador.hide()
+	_ocultar_alcances_torres()
 
 	var nome_tipo := "rápida" if tipo == "rapida" else "normal"
 	status_ativacao.text = "Torre %d ativada como %s por %d E." % [indice + 1, nome_tipo, custo]
 	_atualizar_economia()
 	if not partida_iniciada:
 		_iniciar_fase()
+
+func _ao_clicar_torre(_camera_evento: Camera3D, evento: InputEvent, _posicao: Vector3, _normal: Vector3, _indice_forma: int, indice: int) -> void:
+	if not evento is InputEventMouseButton:
+		return
+	var clique := evento as InputEventMouseButton
+	if clique.button_index != MOUSE_BUTTON_LEFT or not clique.pressed:
+		return
+	if indice < 0 or indice >= torres.size():
+		return
+	var torre := torres[indice] as Node3D
+	if torre == null:
+		return
+	var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
+	if indicador == null:
+		return
+	if not tipos_ativados[indice].is_empty() and torre_com_alcance_selecionada == torre and indicador.visible:
+		indicador.hide()
+		torre_com_alcance_selecionada = null
+		return
+	if torre_com_alcance_selecionada != null:
+		var indicador_anterior := torre_com_alcance_selecionada.get_node_or_null("IndicadorAlcance") as MeshInstance3D
+		if indicador_anterior != null:
+			indicador_anterior.hide()
+	if tipos_ativados[indice].is_empty():
+		torre_com_alcance_selecionada = null
+		return
+	indicador.show()
+	torre_com_alcance_selecionada = torre
+
+func _ocultar_alcances_torres() -> void:
+	torre_com_alcance_selecionada = null
+	for torre in torres:
+		var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
+		if indicador != null:
+			indicador.hide()
 
 func _atualizar_economia() -> void:
 	energia_label.text = "%d E" % player_energy

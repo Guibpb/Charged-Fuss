@@ -195,7 +195,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.35878283, 0)
 curve = SubResource("Curve3D_j5k5y")
 
 [node name="Torre1" parent="." unique_id=1779074686 instance=ExtResource("2_torre")]
-transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -4.5, 1.12, -10.234238)
+transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -5.3, 1.12, -10.18)
 
 [node name="Identificador" type="Label3D" parent="Torre1" unique_id=653361089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5494039, 0)
@@ -207,7 +207,7 @@ font_size = 96
 outline_size = 16
 
 [node name="Torre2" parent="." unique_id=188372118 instance=ExtResource("2_torre")]
-transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, -16.6, 1.12, -4.1)
+transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, -17.4, 1.12, -4.1)
 
 [node name="Identificador" type="Label3D" parent="Torre2" unique_id=989446483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5947506, 0)
@@ -219,7 +219,7 @@ font_size = 96
 outline_size = 16
 
 [node name="Torre3" parent="." unique_id=289167391 instance=ExtResource("2_torre")]
-transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 7.6, 1.12, 2)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 8.4, 1.12, 2)
 
 [node name="Identificador" type="Label3D" parent="Torre3" unique_id=824776278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5809634, 0)
@@ -231,7 +231,7 @@ font_size = 96
 outline_size = 16
 
 [node name="Torre4" parent="." unique_id=101451922 instance=ExtResource("2_torre")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.6, 1.12, 9)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4, 1.12, 9)
 
 [node name="Identificador" type="Label3D" parent="Torre4" unique_id=1900501869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5745323, 0)
