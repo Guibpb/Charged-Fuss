@@ -16,6 +16,8 @@ class SegmentoEsteira:
 
 var health: int = 40
 var is_boss: bool = false
+var multiplicador_lentidao: float = 1.0
+var tempo_lentidao: float = 0.0
 
 var caminho: PathFollow3D
 var death_processed := false
@@ -68,6 +70,10 @@ func configurar_como_chefe() -> void:
 func _physics_process(delta) -> void:
 	if not is_instance_valid(caminho):
 		return
+	if tempo_lentidao > 0.0:
+		tempo_lentidao = maxf(0.0, tempo_lentidao - delta)
+		if tempo_lentidao <= 0.0:
+			multiplicador_lentidao = 1.0
 
 	var path := caminho.get_parent() as Path3D
 	if path == null or path.curve == null:
@@ -75,7 +81,7 @@ func _physics_process(delta) -> void:
 		return
 
 	var comprimento_caminho: float = path.curve.get_baked_length()
-	var distancia_percorrida: float = minf(maxf(float(speed) * delta, 0.0), maxf(comprimento_caminho - caminho.progress, 0.0))
+	var distancia_percorrida: float = minf(maxf(float(speed) * multiplicador_lentidao * delta, 0.0), maxf(comprimento_caminho - caminho.progress, 0.0))
 	caminho.progress += distancia_percorrida
 	_atualizar_esteiras(distancia_percorrida)
 	if caminho.progress >= path.curve.get_baked_length():
@@ -166,7 +172,12 @@ func _atualizar_esteiras(distancia: float) -> void:
 		var posicao_local := Vector3(elo.posicao_x, amostra.x, amostra.y)
 		elo.malha.global_transform = _modelo_inimigo.global_transform * Transform3D(base, posicao_local)
 
-func take_damage(amount):
+func aplicar_lentidao(multiplicador: float, duracao: float) -> void:
+	# Pulsos repetidos renovam o mesmo efeito; a velocidade não se multiplica de novo.
+	multiplicador_lentidao = minf(multiplicador_lentidao, clampf(multiplicador, 0.0, 1.0))
+	tempo_lentidao = maxf(tempo_lentidao, duracao)
+
+func take_damage(amount: int) -> void:
 	if death_processed:
 		return
 	health -= amount

@@ -1,20 +1,40 @@
 extends Node3D
 
 const ENEMY_SCENE = preload("res://Enemy.tscn")
+const TOWER_SCENE: PackedScene = preload("res://TorreBasica.tscn")
 const METRICA_MAPA = preload("res://MetricaMapa.gd")
-const BASIC_TOWER_COST = 60
-const FAST_TOWER_COST = 75
+const TOWER_COSTS: Dictionary = {"basica": 60, "rapida": 75, "tesla": 80, "chama": 85}
+const TOWER_NAMES: Dictionary = {"basica": "Torre normal", "rapida": "Torre rápida", "tesla": "Tesla", "chama": "Lança-chamas"}
+const TOWER_TYPES: Array[String] = ["basica", "rapida", "tesla", "chama"]
+const BASE_POSITIONS: Array[Vector2] = [
+	Vector2(-16.60, -4.50),
+	Vector2(-3.10, -10.29),
+	Vector2(-6.73, -4.23),
+	Vector2(-11.94, 2.13),
+	Vector2(-10.53, 8.22),
+	Vector2(1.50, 1.98),
+]
+const TOWER_DRAG_BUTTON_SCRIPT: Script = preload("res://TowerDragButton.gd")
+const TOWER_DROP_LAYER_SCRIPT: Script = preload("res://TowerDropLayer.gd")
 const UPGRADE_COSTS: Dictionary = {
 	"dano": 45,
 	"alcance": 30,
 	"velocidade": 55,
 	"balas": 65,
+	"tesla_rapidez": 55,
+	"tesla_alcance": 35,
+	"chama_dano": 45,
+	"chama_alcance": 35,
 }
 const UPGRADE_NAMES: Dictionary = {
 	"dano": "Mais dano",
 	"alcance": "Alcance +",
 	"velocidade": "Velocidade +",
 	"balas": "Balas ×2",
+	"tesla_rapidez": "Pulso rápido",
+	"tesla_alcance": "Alcance +",
+	"chama_dano": "Mais dano",
+	"chama_alcance": "Alcance +",
 }
 const TOTAL_RODADAS: int = 10
 const INIMIGOS_POR_RODADA: Array[int] = [5, 8, 15, 15, 25, 30, 35, 40, 50, 50]
@@ -22,13 +42,13 @@ const ENERGIA_POR_DERROTA: int = 1
 const BONUS_RODADA: int = 10
 const INTERVALOS_RODADA: Array[float] = [1.8, 1.8, 1.5, 0.8, 1.0, 1.0, 0.8, 0.6, 0.8, 0.8]
 const TUTORIAIS_RODADA: Array[String] = [
-	"Ative uma torre para defender a rota. A rodada já começou.",
-	"Compare a torre normal com a rápida: elas têm ritmos e setores diferentes.",
-	"Cada inimigo derrotado gera energia para ativar mais torres.",
-	"Observe o setor de visão e o alcance das torres ao longo do caminho.",
+	"Arraste sua primeira torre até uma base para começar.",
+	"Compare a torre normal com a rápida: elas têm ritmos e alcances diferentes.",
+	"Cada inimigo derrotado gera energia para posicionar mais torres.",
+	"Observe os círculos de alcance e posicione outras defesas.",
 	"Combine torres com características diferentes para cobrir melhor a rota.",
 	"Você pode abrir o painel durante a partida; o jogo continuará acontecendo.",
-	"Distribua as ativações para cobrir diferentes trechos do caminho.",
+	"Distribua as torres para cobrir trechos diferentes do caminho.",
 	"Mais inimigos estarão na rota ao mesmo tempo. Acompanhe o campo inteiro.",
 	"Prepare suas torres para a rodada final e guarde energia quando puder.",
 	"Última rodada: derrote o chefe, que tem três vezes a vida normal.",
@@ -49,47 +69,25 @@ const TUTORIAIS_RODADA: Array[String] = [
 @onready var velocidade_label: Label = $HUD/VelocidadeLabel
 @onready var menu_inicial: Control = $HUD/MenuInicial
 @onready var menu_torres: Control = $HUD/MenuTorres
-@onready var botao_jogo: Button = $HUD/MenuTorres/Painel/Conteudo/Comecar
-@onready var instrucao_torres: Label = $HUD/MenuTorres/Painel/Conteudo/Instrucao
-@onready var status_ativacao: Label = $HUD/MenuTorres/Painel/Conteudo/Status
 @onready var botao_gerenciar_torres: Button = $HUD/GerenciarTorres
 @onready var botao_pause: Button = $HUD/BotaoPause
-@onready var botao_ativar_basica: Array[Button] = [
-	$HUD/MenuTorres/Painel/Conteudo/Torre1/Linha/AtivarBasica,
-	$HUD/MenuTorres/Painel/Conteudo/Torre2/Linha/AtivarBasica,
-	$HUD/MenuTorres/Painel/Conteudo/Torre3/Linha/AtivarBasica,
-	$HUD/MenuTorres/Painel/Conteudo/Torre4/Linha/AtivarBasica,
-]
-@onready var botao_ativar_rapida: Array[Button] = [
-	$HUD/MenuTorres/Painel/Conteudo/Torre1/Linha/AtivarRapida,
-	$HUD/MenuTorres/Painel/Conteudo/Torre2/Linha/AtivarRapida,
-	$HUD/MenuTorres/Painel/Conteudo/Torre3/Linha/AtivarRapida,
-	$HUD/MenuTorres/Painel/Conteudo/Torre4/Linha/AtivarRapida,
-]
-@onready var status_torres: Array[Label] = [
-	$HUD/MenuTorres/Painel/Conteudo/Torre1/Estado,
-	$HUD/MenuTorres/Painel/Conteudo/Torre2/Estado,
-	$HUD/MenuTorres/Painel/Conteudo/Torre3/Estado,
-	$HUD/MenuTorres/Painel/Conteudo/Torre4/Estado,
-]
-@onready var torres: Array[Node] = [
-	$Torre1,
-	$Torre2,
-	$Torre3,
-	$Torre4,
-]
 @onready var camera: Camera3D = $Camera3D
 @onready var malha_chao: MeshInstance3D = $Chão/StaticBody3D/MeshInstance3D
 @onready var tela_derrota: Control = $HUD/TelaDerrota
 @onready var tela_vitoria: Control = $HUD/TelaVitoria
 
-var tipos_ativados: Array[String] = ["", "", "", ""]
-var upgrades_comprados: Array[Dictionary] = [
-	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
-	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
-	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
-	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
-]
+var instrucao_torres: Label
+var status_ativacao: Label
+var botao_fechar_loja: Button
+var loja_torres: VBoxContainer
+var painel_upgrades: VBoxContainer
+var rotulo_upgrade: Label
+var botoes_loja: Array[Button] = []
+var botoes_upgrade: Array[Button] = []
+var bases: Array[Node3D] = []
+var torres: Array[Node3D] = []
+var tipos_ativados: Array[String] = ["", "", "", "", "", ""]
+var upgrades_comprados: Array[Dictionary] = []
 var partida_iniciada := false
 var rodada_atual: int = 0
 var inimigos_restantes: int = 0
@@ -103,32 +101,130 @@ var nivel_velocidade: int = 1
 var sequencia_cheat: String = ""
 var revisao_fluxo_rodadas: int = 0
 var torre_com_alcance_selecionada: Node3D = null
+var indice_torre_selecionada: int = -1
 
 func _ready() -> void:
 	Engine.time_scale = 1.0
 	set_process_unhandled_key_input(true)
 	get_tree().paused = true
 	_configurar_camera()
+	_criar_bases()
+	_criar_interface_de_torres()
+	_criar_camadas_de_arrastar_soltar()
 	_update_health_label()
 	_atualizar_economia()
 	botao_pause.pressed.connect(_alternar_pausa)
-	botao_jogo.pressed.connect(_on_game_play_pressed)
 	botao_gerenciar_torres.pressed.connect(_on_gerenciar_torres_pressed)
-	for indice in range(torres.size()):
-		botao_ativar_basica[indice].pressed.connect(_ativar_torre.bind(indice, "basica"))
-		botao_ativar_rapida[indice].pressed.connect(_ativar_torre.bind(indice, "rapida"))
-		var torre_clicavel := torres[indice] as CollisionObject3D
-		if torre_clicavel != null:
-			torre_clicavel.input_ray_pickable = true
-			torre_clicavel.input_event.connect(_ao_clicar_torre.bind(indice))
 	get_viewport().physics_object_picking = true
 
 	if caminho.curve == null or caminho.curve.get_baked_length() <= 0.0:
 		push_error("O Path3D precisa ter uma curva com pelo menos dois pontos.")
-		botao_jogo.disabled = true
+		menu_inicial.get_node("Centralizar/Conteudo/Play").set("disabled", true)
 	else:
-		_orientar_torres_para_caminho()
 		_criar_visual_do_caminho()
+
+func _criar_bases() -> void:
+	torres.resize(BASE_POSITIONS.size())
+	upgrades_comprados.clear()
+	for indice in range(BASE_POSITIONS.size()):
+		upgrades_comprados.append({})
+		var base := Node3D.new()
+		base.name = "BaseVazia"
+		base.position = Vector3(BASE_POSITIONS[indice].x, 0.0, BASE_POSITIONS[indice].y)
+		var malha := MeshInstance3D.new()
+		var caixa := BoxMesh.new()
+		caixa.size = Vector3(2.3, 0.24, 2.3)
+		malha.mesh = caixa
+		malha.position.y = 0.12
+		var material := StandardMaterial3D.new()
+		material.albedo_color = Color(0.035, 0.065, 0.08, 1.0)
+		material.metallic = 0.65
+		material.roughness = 0.55
+		malha.material_override = material
+		base.add_child(malha)
+		add_child(base)
+		bases.append(base)
+
+func _criar_interface_de_torres() -> void:
+	var conteudo := $HUD/MenuTorres/Painel/Conteudo as VBoxContainer
+	var painel := $HUD/MenuTorres/Painel as PanelContainer
+	painel.custom_minimum_size = Vector2(320.0, 500.0)
+	painel.offset_bottom = 616.0
+	while conteudo.get_child_count() > 0:
+		var filho: Node = conteudo.get_child(0)
+		conteudo.remove_child(filho)
+		filho.queue_free()
+	conteudo.add_theme_constant_override("separation", 10)
+	var titulo := Label.new()
+	titulo.text = "DEFESAS DISPONÍVEIS"
+	titulo.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	titulo.add_theme_font_size_override("font_size", 20)
+	titulo.add_theme_color_override("font_color", Color(0.45, 0.9, 0.91, 1.0))
+	conteudo.add_child(titulo)
+	instrucao_torres = Label.new()
+	instrucao_torres.text = "Arraste até uma base. Clique numa torre para abrir alcance e melhorias."
+	instrucao_torres.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	instrucao_torres.custom_minimum_size.y = 50.0
+	conteudo.add_child(instrucao_torres)
+	loja_torres = VBoxContainer.new()
+	loja_torres.add_theme_constant_override("separation", 8)
+	conteudo.add_child(loja_torres)
+	var nomes: Array[String] = ["TORRE NORMAL", "TORRE RÁPIDA", "TESLA", "LANÇA-CHAMAS"]
+	for indice in range(TOWER_TYPES.size()):
+		var tipo: String = TOWER_TYPES[indice]
+		var botao := Button.new()
+		botao.set_script(TOWER_DRAG_BUTTON_SCRIPT)
+		botao.set("tipo_torre", tipo)
+		botao.text = "%s\n%d E" % [nomes[indice], int(TOWER_COSTS[tipo])]
+		botao.custom_minimum_size = Vector2(276.0, 58.0)
+		botao.add_theme_font_size_override("font_size", 13)
+		loja_torres.add_child(botao)
+		botoes_loja.append(botao)
+	status_ativacao = Label.new()
+	status_ativacao.text = "Escolha uma torre para iniciar a defesa."
+	status_ativacao.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	status_ativacao.custom_minimum_size.y = 40.0
+	status_ativacao.add_theme_color_override("font_color", Color(0.9, 0.75, 0.42, 1.0))
+	conteudo.add_child(status_ativacao)
+	
+	painel_upgrades = VBoxContainer.new()
+	painel_upgrades.visible = false
+	painel_upgrades.add_theme_constant_override("separation", 8)
+	conteudo.add_child(painel_upgrades)
+	rotulo_upgrade = Label.new()
+	rotulo_upgrade.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	rotulo_upgrade.add_theme_font_size_override("font_size", 16)
+	rotulo_upgrade.add_theme_color_override("font_color", Color(0.45, 0.9, 0.91, 1.0))
+	painel_upgrades.add_child(rotulo_upgrade)
+	for indice in range(2):
+		var botao_upgrade := Button.new()
+		botao_upgrade.custom_minimum_size = Vector2(276.0, 58.0)
+		botao_upgrade.add_theme_font_size_override("font_size", 12)
+		botao_upgrade.pressed.connect(_comprar_upgrade.bind(indice))
+		painel_upgrades.add_child(botao_upgrade)
+		botoes_upgrade.append(botao_upgrade)
+	var voltar := Button.new()
+	voltar.text = "VOLTAR À LOJA"
+	voltar.custom_minimum_size = Vector2(276.0, 48.0)
+	voltar.pressed.connect(_voltar_para_loja)
+	painel_upgrades.add_child(voltar)
+	botao_fechar_loja = Button.new()
+	botao_fechar_loja.text = "FECHAR LOJA"
+	botao_fechar_loja.custom_minimum_size = Vector2(276.0, 44.0)
+	botao_fechar_loja.pressed.connect(_fechar_loja)
+	conteudo.add_child(botao_fechar_loja)
+
+func _criar_camadas_de_arrastar_soltar() -> void:
+	var camada := Control.new()
+	camada.name = "CamadaSoltarTorres"
+	camada.set_script(TOWER_DROP_LAYER_SCRIPT)
+	camada.set("controlador", self)
+	camada.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	camada.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	camada.z_index = 20
+	$HUD.add_child(camada)
+	for botao in botoes_loja:
+		botao.set("camada_soltar", camada)
 
 func _orientar_torres_para_caminho() -> void:
 	var pontos := caminho.curve.get_baked_points()
@@ -136,23 +232,22 @@ func _orientar_torres_para_caminho() -> void:
 		return
 
 	for torre in torres:
-		var torre_3d := torre as Node3D
-		if torre_3d == null:
+		if torre == null or not is_instance_valid(torre):
 			continue
 		var ponto_mais_proximo := caminho.to_global(pontos[0])
 		var menor_distancia := INF
 		for ponto in pontos:
 			var ponto_global := caminho.to_global(ponto)
-			var diferenca := ponto_global - torre_3d.global_position
+			var diferenca := ponto_global - torre.global_position
 			diferenca.y = 0.0
 			var distancia_quadrada := diferenca.length_squared()
 			if distancia_quadrada < menor_distancia:
 				menor_distancia = distancia_quadrada
 				ponto_mais_proximo = ponto_global
-		ponto_mais_proximo.y = torre_3d.global_position.y
-		var direcao_setor := ponto_mais_proximo - torre_3d.global_position
-		if torre_3d.has_method("definir_direcao_setor"):
-			torre_3d.call("definir_direcao_setor", direcao_setor)
+		ponto_mais_proximo.y = torre.global_position.y
+		var direcao_setor := ponto_mais_proximo - torre.global_position
+		if torre.has_method("definir_direcao_setor"):
+			torre.call("definir_direcao_setor", direcao_setor)
 
 func _iniciar_rodada(numero_rodada: int) -> void:
 	if fase_encerrada or not partida_iniciada:
@@ -439,8 +534,10 @@ func _on_menu_play_pressed() -> void:
 	velocidade_label.hide()
 	botao_pause.hide()
 	botao_gerenciar_torres.hide()
-	instrucao_torres.text = "Escolha sua primeira torre. A rodada começa assim que você ativá-la."
-	status_ativacao.text = "A primeira torre inicia a partida automaticamente."
+	loja_torres.show()
+	painel_upgrades.hide()
+	instrucao_torres.text = "Arraste até uma base. Clique numa torre para abrir alcance e melhorias."
+	status_ativacao.text = "A partida começa quando você posicionar a primeira torre."
 	get_tree().paused = true
 	_atualizar_economia()
 
@@ -463,55 +560,151 @@ func _iniciar_fase() -> void:
 	_iniciar_rodada(1)
 
 func _on_gerenciar_torres_pressed() -> void:
-	if not partida_iniciada:
+	if menu_torres.visible:
+		menu_torres.hide()
+		botao_gerenciar_torres.text = "GERENCIAR TORRES" if partida_iniciada else "ABRIR LOJA"
 		return
-	botao_jogo.text = "FECHAR PAINEL"
-	botao_gerenciar_torres.hide()
+	loja_torres.show()
+	status_ativacao.show()
+	painel_upgrades.hide()
+	indice_torre_selecionada = -1
 	menu_torres.show()
+	botao_gerenciar_torres.text = "FECHAR LOJA"
 
-func _ativar_torre(indice: int, tipo: String) -> void:
-	if indice < 0 or indice >= torres.size():
-		return
-	if not tipos_ativados[indice].is_empty():
-		_comprar_upgrade(indice, tipo)
-		return
+func _fechar_loja() -> void:
+	menu_torres.hide()
+	botao_gerenciar_torres.text = "GERENCIAR TORRES" if partida_iniciada else "ABRIR LOJA"
+	botao_gerenciar_torres.show()
 
-	var custo := BASIC_TOWER_COST if tipo == "basica" else FAST_TOWER_COST
+func receber_soltar_torre(tipo: String, posicao_tela: Vector2) -> void:
+	if not TOWER_TYPES.has(tipo) or fase_encerrada:
+		return
+	var ponto_projetado: Variant = _projetar_no_chao(posicao_tela)
+	if ponto_projetado == null:
+		return
+	var ponto_mundo: Vector3 = ponto_projetado
+	var indice_base := -1
+	var menor_distancia: float = INF
+	for indice in range(bases.size()):
+		if torres[indice] != null:
+			continue
+		var base_pos := bases[indice].global_position
+		var diferenca := Vector2(base_pos.x - ponto_mundo.x, base_pos.z - ponto_mundo.z)
+		if diferenca.length() < menor_distancia:
+			menor_distancia = diferenca.length()
+			indice_base = indice
+	if indice_base < 0 or menor_distancia > 1.75:
+		status_ativacao.text = "Solte a torre sobre uma base vazia."
+		return
+	_comprar_torre(indice_base, tipo)
+
+func _projetar_no_chao(posicao_tela: Vector2) -> Variant:
+	var origem := camera.project_ray_origin(posicao_tela)
+	var direcao := camera.project_ray_normal(posicao_tela)
+	if absf(direcao.y) < 0.0001:
+		return null
+	var altura_chao: float = malha_chao.global_position.y
+	var distancia: float = (altura_chao - origem.y) / direcao.y
+	if distancia < 0.0:
+		return null
+	return origem + direcao * distancia
+
+func _comprar_torre(indice: int, tipo: String) -> void:
+	if indice < 0 or indice >= bases.size() or torres[indice] != null:
+		return
+	var custo := int(TOWER_COSTS[tipo])
 	if player_energy < custo:
 		status_ativacao.text = "Energia insuficiente. Você precisa de %d E." % custo
 		return
 
-	torres[indice].call("ativar", tipo == "rapida")
+	var torre: Node3D = TOWER_SCENE.instantiate() as Node3D
+	if torre == null:
+		push_error("Não foi possível criar a torre escolhida.")
+		return
+	torre.call("configurar_tipo", tipo)
+	bases[indice].add_child(torre)
+	torre.position = Vector3(0.0, 1.12, 0.0)
+	torres[indice] = torre
+	var torre_clicavel := torre as CollisionObject3D
+	if torre_clicavel != null:
+		torre_clicavel.input_ray_pickable = true
+		torre_clicavel.input_event.connect(_ao_clicar_torre.bind(indice))
+	torre.call("ativar", tipo)
+	var direcao_setor := _direcao_para_caminho(torre.global_position)
+	if torre.has_method("definir_direcao_setor"):
+		torre.call("definir_direcao_setor", direcao_setor)
 	player_energy -= custo
 	tipos_ativados[indice] = tipo
 	_ocultar_alcances_torres()
-
-	var nome_tipo := "rápida" if tipo == "rapida" else "normal"
-	status_ativacao.text = "Torre %d ativada como %s por %d E." % [indice + 1, nome_tipo, custo]
+	status_ativacao.text = "%s posicionada por %d E." % [TOWER_NAMES[tipo], custo]
 	_atualizar_economia()
 	if not partida_iniciada:
 		_iniciar_fase()
 
-func _comprar_upgrade(indice: int, botao_tipo: String) -> void:
-	var tipo_torre := tipos_ativados[indice]
-	var melhoria := ""
-	if tipo_torre == "rapida":
-		melhoria = "velocidade" if botao_tipo == "basica" else "balas"
-	else:
-		melhoria = "dano" if botao_tipo == "basica" else "alcance"
+func _direcao_para_caminho(posicao_torre: Vector3) -> Vector3:
+	var mais_proximo := posicao_torre
+	var distancia_menor: float = INF
+	for ponto in caminho.curve.get_baked_points():
+		var global_ponto := caminho.to_global(ponto)
+		var diferenca := Vector2(global_ponto.x - posicao_torre.x, global_ponto.z - posicao_torre.z)
+		if diferenca.length_squared() < distancia_menor:
+			distancia_menor = diferenca.length_squared()
+			mais_proximo = global_ponto
+	mais_proximo.y = posicao_torre.y
+	return mais_proximo - posicao_torre
 
-	var custo := int(UPGRADE_COSTS[melhoria])
-	if upgrades_comprados[indice][melhoria]:
+func _mostrar_upgrades(indice: int) -> void:
+	if indice < 0 or indice >= torres.size() or torres[indice] == null:
+		return
+	indice_torre_selecionada = indice
+	var tipo: String = tipos_ativados[indice]
+	var melhorias: Array[String] = []
+	match tipo:
+		"basica":
+			melhorias = ["dano", "alcance"]
+		"rapida":
+			melhorias = ["velocidade", "balas"]
+		"tesla":
+			melhorias = ["tesla_rapidez", "tesla_alcance"]
+		"chama":
+			melhorias = ["chama_dano", "chama_alcance"]
+	rotulo_upgrade.text = "MELHORIAS • %s" % str(TOWER_NAMES[tipo]).to_upper()
+	for indice_botao in range(botoes_upgrade.size()):
+		var chave: String = melhorias[indice_botao]
+		var botao: Button = botoes_upgrade[indice_botao]
+		botao.set_meta("melhoria", chave)
+		var comprada: bool = bool(upgrades_comprados[indice].get(chave, false))
+		botao.text = "%s%s\n%d E" % [UPGRADE_NAMES[chave], "  ✓" if comprada else "", int(UPGRADE_COSTS[chave])]
+		botao.disabled = comprada or player_energy < int(UPGRADE_COSTS[chave])
+	loja_torres.hide()
+	status_ativacao.hide()
+	painel_upgrades.show()
+
+func _voltar_para_loja() -> void:
+	indice_torre_selecionada = -1
+	status_ativacao.show()
+	painel_upgrades.hide()
+	loja_torres.show()
+
+func _comprar_upgrade(indice_botao: int) -> void:
+	var indice: int = indice_torre_selecionada
+	if indice < 0 or indice >= torres.size() or torres[indice] == null:
+		return
+	if indice_botao < 0 or indice_botao >= botoes_upgrade.size():
+		return
+	var melhoria := str(botoes_upgrade[indice_botao].get_meta("melhoria", ""))
+	var custo := int(UPGRADE_COSTS.get(melhoria, 0))
+	if melhoria.is_empty() or bool(upgrades_comprados[indice].get(melhoria, false)):
 		return
 	if player_energy < custo:
 		status_ativacao.text = "Energia insuficiente. Você precisa de %d E." % custo
 		return
-
 	torres[indice].call("aplicar_upgrade", melhoria)
 	upgrades_comprados[indice][melhoria] = true
 	player_energy -= custo
-	status_ativacao.text = "%s comprada para a torre %d por %d E." % [UPGRADE_NAMES[melhoria], indice + 1, custo]
+	status_ativacao.text = "%s instalada por %d E." % [UPGRADE_NAMES[melhoria], custo]
 	_atualizar_economia()
+	_mostrar_upgrades(indice)
 
 func _ao_clicar_torre(_camera_evento: Camera3D, evento: InputEvent, _posicao: Vector3, _normal: Vector3, _indice_forma: int, indice: int) -> void:
 	if not evento is InputEventMouseButton:
@@ -519,15 +712,13 @@ func _ao_clicar_torre(_camera_evento: Camera3D, evento: InputEvent, _posicao: Ve
 	var clique := evento as InputEventMouseButton
 	if clique.button_index != MOUSE_BUTTON_LEFT or not clique.pressed:
 		return
-	if indice < 0 or indice >= torres.size():
+	if indice < 0 or indice >= torres.size() or torres[indice] == null:
 		return
-	var torre := torres[indice] as Node3D
-	if torre == null:
-		return
+	var torre: Node3D = torres[indice]
 	var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
 	if indicador == null:
 		return
-	if not tipos_ativados[indice].is_empty() and torre_com_alcance_selecionada == torre and indicador.visible:
+	if torre_com_alcance_selecionada == torre and indicador.visible:
 		indicador.hide()
 		torre_com_alcance_selecionada = null
 		return
@@ -535,59 +726,27 @@ func _ao_clicar_torre(_camera_evento: Camera3D, evento: InputEvent, _posicao: Ve
 		var indicador_anterior := torre_com_alcance_selecionada.get_node_or_null("IndicadorAlcance") as MeshInstance3D
 		if indicador_anterior != null:
 			indicador_anterior.hide()
-	if tipos_ativados[indice].is_empty():
-		torre_com_alcance_selecionada = null
-		return
 	indicador.show()
 	torre_com_alcance_selecionada = torre
+	_mostrar_upgrades(indice)
+	menu_torres.show()
 
 func _ocultar_alcances_torres() -> void:
 	torre_com_alcance_selecionada = null
 	for torre in torres:
+		if torre == null or not is_instance_valid(torre):
+			continue
 		var indicador := torre.get_node_or_null("IndicadorAlcance") as MeshInstance3D
 		if indicador != null:
 			indicador.hide()
 
 func _atualizar_economia() -> void:
 	energia_label.text = "%d E" % player_energy
-	for indice in range(tipos_ativados.size()):
-		var tipo := tipos_ativados[indice]
-		if tipo.is_empty():
-			status_torres[indice].text = "TORRE %02d  •  DESLIGADA" % (indice + 1)
-			status_torres[indice].add_theme_color_override("font_color", Color(0.62, 0.7, 0.74, 1))
-			botao_ativar_basica[indice].add_theme_font_size_override("font_size", 14)
-			botao_ativar_rapida[indice].add_theme_font_size_override("font_size", 14)
-			botao_ativar_basica[indice].text = "Normal · %d E" % BASIC_TOWER_COST
-			botao_ativar_rapida[indice].text = "Rápida · %d E" % FAST_TOWER_COST
-			botao_ativar_basica[indice].disabled = player_energy < BASIC_TOWER_COST
-			botao_ativar_rapida[indice].disabled = player_energy < FAST_TOWER_COST
-		else:
-			var nome_tipo := "rápida" if tipo == "rapida" else "normal"
-			var tipo_melhoria_1 := "velocidade" if tipo == "rapida" else "dano"
-			var tipo_melhoria_2 := "balas" if tipo == "rapida" else "alcance"
-			var tem_melhoria: bool = bool(upgrades_comprados[indice][tipo_melhoria_1]) or bool(upgrades_comprados[indice][tipo_melhoria_2])
-			var estado := nome_tipo.to_upper() + (" +" if tem_melhoria else "")
-			status_torres[indice].text = "TORRE %02d  •  %s" % [indice + 1, estado]
-			status_torres[indice].add_theme_color_override("font_color", Color(0.4, 0.88, 0.84, 1))
-			botao_ativar_basica[indice].add_theme_font_size_override("font_size", 12)
-			botao_ativar_rapida[indice].add_theme_font_size_override("font_size", 12)
-			botao_ativar_basica[indice].text = "%s\n%d E%s" % [UPGRADE_NAMES[tipo_melhoria_1], UPGRADE_COSTS[tipo_melhoria_1], " ✓" if upgrades_comprados[indice][tipo_melhoria_1] else ""]
-			botao_ativar_rapida[indice].text = "%s\n%d E%s" % [UPGRADE_NAMES[tipo_melhoria_2], UPGRADE_COSTS[tipo_melhoria_2], " ✓" if upgrades_comprados[indice][tipo_melhoria_2] else ""]
-			botao_ativar_basica[indice].disabled = upgrades_comprados[indice][tipo_melhoria_1] or player_energy < UPGRADE_COSTS[tipo_melhoria_1]
-			botao_ativar_rapida[indice].disabled = upgrades_comprados[indice][tipo_melhoria_2] or player_energy < UPGRADE_COSTS[tipo_melhoria_2]
-
-	if partida_iniciada:
-		botao_jogo.text = "FECHAR PAINEL"
-		botao_jogo.disabled = false
-		botao_jogo.show()
-	else:
-		botao_jogo.hide()
-
-func _on_game_play_pressed() -> void:
-	if not partida_iniciada:
-		return
-	menu_torres.hide()
-	botao_gerenciar_torres.show()
+	for indice in range(botoes_loja.size()):
+		var tipo: String = TOWER_TYPES[indice]
+		botoes_loja[indice].disabled = player_energy < int(TOWER_COSTS[tipo])
+	if indice_torre_selecionada >= 0 and menu_torres.visible:
+		_mostrar_upgrades(indice_torre_selecionada)
 
 func _configurar_camera() -> void:
 	camera.projection = Camera3D.PROJECTION_ORTHOGONAL

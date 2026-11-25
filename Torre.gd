@@ -1,15 +1,17 @@
 extends CharacterBody3D
 
 @export var shot_range: float = 5.5
-@export var sector_angle_degrees: float = 100.0
 @export var shot_interval: float = 1.0
-@export var damage: int = 30
+@export var damage: int = 35
 @export var projectile_scene: PackedScene = preload("res://Projectile.tscn")
 
 const TURRET_UP_SCENE: PackedScene = preload("res://modelos/TurretUp.glb")
+const TESLA_SCENE: PackedScene = preload("res://modelos/Tesla1.glb")
+const TESLA_UP_SCENE: PackedScene = preload("res://modelos/Tesla2.glb")
 
 var active := false
 var torre_rapida := false
+var tipo_torre: String = "basica"
 var modelo_melhorado := false
 var balas_por_disparo: int = 1
 var dano_normal_configurado: int = 0
@@ -24,14 +26,74 @@ const ALTURA_TOTAL_MODELO: float = 2.94
 const COMPRIMENTO_CANHAO_MODELO: float = 2.8
 const DESLOCAMENTO_FRENTE_MODELO: float = PI * 0.5
 const ESCALA_MODELO_MELHORADO: float = 1.35
-const INCLINACAO_DESLIGADA: float = -0.314159265
 
 func _ready() -> void:
 	add_to_group("torres")
 	set_physics_process(false)
 	dano_normal_configurado = damage
-	_preparar_modelo_torre()
-	_atualizar_cor(Color(0.48, 0.51, 0.54, 1.0), 0.28)
+	if tipo_torre == "tesla":
+		_preparar_modelo_tesla(false)
+	elif tipo_torre == "chama":
+		_preparar_modelo_chamas()
+	else:
+		_preparar_modelo_torre()
+
+func configurar_tipo(tipo: String) -> void:
+	tipo_torre = tipo
+
+func _preparar_modelo_tesla_malha(cena_modelo: PackedScene, melhorado: bool) -> void:
+	var modelo := get_node_or_null("Modelo") as Node3D
+	if modelo == null:
+		return
+	for filho in modelo.get_children():
+		modelo.remove_child(filho)
+		filho.queue_free()
+	var malha_tesla := cena_modelo.instantiate() as Node3D
+	if malha_tesla == null:
+		push_error("Não foi possível carregar o modelo da Tesla.")
+		return
+	malha_tesla.name = "ModeloTesla"
+	modelo.scale = Vector3.ONE * 0.8
+	modelo.position = Vector3(6.4, -1.0, 0.0 if melhorado else -3.2)
+	modelo.add_child(malha_tesla)
+	modelo_melhorado = melhorado
+	_atualizar_cor(Color(0.25, 0.78, 0.92, 1.0), 0.13)
+
+func _preparar_modelo_tesla(melhorado: bool) -> void:
+	var cena_modelo: PackedScene = TESLA_UP_SCENE if melhorado else TESLA_SCENE
+	_preparar_modelo_tesla_malha(cena_modelo, melhorado)
+
+func _preparar_modelo_chamas() -> void:
+	var modelo := get_node_or_null("Modelo") as Node3D
+	if modelo == null:
+		return
+	for filho in modelo.get_children():
+		modelo.remove_child(filho)
+		filho.queue_free()
+	modelo.position = Vector3(0.0, -1.0, 0.0)
+	modelo.scale = Vector3.ONE
+	_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 0.32, 0.0), Vector3(1.4, 0.28, 1.4), Color(0.16, 0.2, 0.23, 1.0))
+	_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 0.72, 0.0), Vector3(0.9, 0.78, 0.9), Color(0.25, 0.3, 0.32, 1.0))
+	_criar_peca_chamas(modelo, BoxMesh.new(), Vector3(0.0, 0.95, 0.0), Vector3(1.15, 0.85, 1.15), Color(0.32, 0.37, 0.39, 1.0))
+	for indice in range(4):
+		var angulo: float = TAU * float(indice) / 4.0
+		var direcao := Vector3(sin(angulo), 0.0, -cos(angulo))
+		var rotacao := Vector3(PI * 0.5, angulo, 0.0)
+		_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 1.0, 0.0) + direcao * 0.8, Vector3(0.24, 0.24, 0.6), Color(0.92, 0.37, 0.1, 1.0), rotacao)
+	_atualizar_cor(Color(0.98, 0.42, 0.12, 1.0), 0.13)
+
+func _criar_peca_chamas(pai: Node3D, malha: PrimitiveMesh, posicao: Vector3, escala: Vector3, cor: Color, rotacao: Vector3 = Vector3.ZERO) -> void:
+	var peca := MeshInstance3D.new()
+	peca.mesh = malha
+	peca.position = posicao
+	peca.scale = escala
+	peca.rotation = rotacao
+	var material := StandardMaterial3D.new()
+	material.albedo_color = cor
+	material.metallic = 0.6
+	material.roughness = 0.42
+	peca.material_override = material
+	pai.add_child(peca)
 
 func _preparar_modelo_torre() -> void:
 	var modelo := get_node_or_null("Modelo") as Node3D
@@ -70,24 +132,32 @@ func _preparar_modelo_torre() -> void:
 func _ajustar_inclinacao_superior() -> void:
 	if parte_superior_rotativa == null:
 		return
-	parte_superior_rotativa.rotation.z = 0.0 if active else INCLINACAO_DESLIGADA
+	parte_superior_rotativa.rotation.z = 0.0
 
-func ativar(rapida: bool) -> void:
+func ativar(tipo: String) -> void:
 	active = true
-	torre_rapida = rapida
+	tipo_torre = tipo
+	torre_rapida = tipo == "rapida"
 	_ajustar_inclinacao_superior()
-	if rapida:
-		shot_range = 4.5
-		sector_angle_degrees = 60.0
-		shot_interval = 0.2
-		damage = 10
-		_atualizar_cor(Color(0.88, 0.5, 0.24, 1.0), 0.15)
-	else:
-		shot_range = 5.5
-		sector_angle_degrees = 100.0
-		shot_interval = 0.8
-		damage = dano_normal_configurado
-		_atualizar_cor(Color(0.28, 0.55, 0.72, 1.0), 0.15)
+	match tipo:
+		"rapida":
+			shot_range = 4.5
+			shot_interval = 0.2
+			damage = 10
+			_atualizar_cor(Color(0.88, 0.5, 0.24, 1.0), 0.13)
+		"tesla":
+			shot_range = 6.5
+			shot_interval = 0.8
+			damage = 6
+		"chama":
+			shot_range = 3.5
+			shot_interval = 0.25
+			damage = 4
+		_:
+			shot_range = 5.5
+			shot_interval = 0.8
+			damage = dano_normal_configurado
+			_atualizar_cor(Color(0.28, 0.55, 0.72, 1.0), 0.13)
 	shot_timer = 0.0
 	_criar_visual_de_alcance()
 	set_physics_process(true)
@@ -95,7 +165,7 @@ func ativar(rapida: bool) -> void:
 func aplicar_upgrade(tipo_upgrade: String) -> void:
 	match tipo_upgrade:
 		"dano":
-			damage = roundi(float(damage) * 1.3)
+			damage = roundi(float(damage) * 1.5)
 		"alcance":
 			if torre_rapida:
 				return
@@ -104,8 +174,26 @@ func aplicar_upgrade(tipo_upgrade: String) -> void:
 			shot_interval /= 1.5
 		"balas":
 			balas_por_disparo = 2
+		"tesla_rapidez":
+			shot_interval = 0.5
+		"tesla_alcance":
+			shot_range *= 1.25
+		"chama_dano":
+			damage = roundi(float(damage) * 1.5)
+		"chama_alcance":
+			shot_range *= 1.25
 		_:
 			return
+	if tipo_torre == "tesla":
+		if not modelo_melhorado:
+			_preparar_modelo_tesla(true)
+		_atualizar_visual_de_alcance()
+		return
+	if tipo_torre == "chama":
+		if not modelo_melhorado:
+			_adicionar_modulos_chamas()
+		_atualizar_visual_de_alcance()
+		return
 	if modelo_melhorado:
 		if tipo_upgrade == "alcance":
 			_atualizar_visual_de_alcance()
@@ -152,9 +240,6 @@ func _substituir_modelo_por_upgrade() -> void:
 	modelo.add_child(novo_modelo)
 	modelo_melhorado = true
 	_preparar_modelo_torre()
-	var identificador := get_node_or_null("Identificador") as Label3D
-	if identificador != null:
-		identificador.position.y = 2.45
 	if torre_rapida:
 		_atualizar_cor(Color(0.88, 0.5, 0.24, 1.0), 0.15)
 	else:
@@ -183,16 +268,24 @@ func _physics_process(delta: float) -> void:
 	shot_timer -= delta
 	if shot_timer > 0.0:
 		return
+	if tipo_torre == "tesla":
+		_executar_pulso_tesla()
+		shot_timer = shot_interval
+		return
+	if tipo_torre == "chama":
+		_executar_pulso_chamas()
+		shot_timer = shot_interval
+		return
 
-	var alvo := _encontrar_alvo_no_setor()
+	var alvo: Node3D = _encontrar_alvo_no_alcance()
 	if alvo == null:
 		return
 
-	var direcao_alvo := alvo.global_position - global_position
+	var direcao_alvo: Vector3 = alvo.global_position - global_position
 	direcao_alvo.y = 0.0
 	if direcao_alvo.length_squared() < 0.0001:
 		return
-	var yaw_alvo := atan2(-direcao_alvo.x, -direcao_alvo.z)
+	var yaw_alvo: float = atan2(-direcao_alvo.x, -direcao_alvo.z)
 	if parte_superior_rotativa != null:
 		var yaw_modelo_alvo := yaw_alvo + DESLOCAMENTO_FRENTE_MODELO
 		var diferenca_angular_modelo := wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI)
@@ -212,11 +305,12 @@ func _physics_process(delta: float) -> void:
 	if shot_timer <= 0.0 and erro_angular_base <= deg_to_rad(3.0):
 		_atirar_no_alvo(alvo)
 
-func _encontrar_alvo_no_setor() -> Node3D:
-	var target = null
-	var furthest_progress := -1.0
-	for enemy in get_tree().get_nodes_in_group("inimigos"):
-		if enemy == self or not is_instance_valid(enemy):
+func _encontrar_alvo_no_alcance() -> Node3D:
+	var target: Node3D = null
+	var furthest_progress: float = -1.0
+	for inimigo in get_tree().get_nodes_in_group("inimigos"):
+		var enemy: Node3D = inimigo as Node3D
+		if enemy == null or enemy == self or not is_instance_valid(enemy):
 			continue
 		var path_follow := enemy.get_parent() as PathFollow3D
 		if path_follow == null:
@@ -224,16 +318,104 @@ func _encontrar_alvo_no_setor() -> Node3D:
 
 		var direcao_alvo: Vector3 = enemy.global_position - global_position
 		direcao_alvo.y = 0.0
-		var distancia_alvo := direcao_alvo.length()
+		var distancia_alvo: float = direcao_alvo.length()
 		if distancia_alvo <= 0.0 or distancia_alvo > shot_range:
 			continue
 
-		var alinhamento := direcao_setor_global.dot(direcao_alvo / distancia_alvo)
-		var limite_setor := cos(deg_to_rad(sector_angle_degrees * 0.5))
-		if alinhamento >= limite_setor and path_follow.progress > furthest_progress:
+		if path_follow.progress > furthest_progress:
 			furthest_progress = path_follow.progress
 			target = enemy
-	return target as Node3D
+	return target
+
+func _inimigos_na_area() -> Array[Node3D]:
+	var alvos: Array[Node3D] = []
+	for inimigo in get_tree().get_nodes_in_group("inimigos"):
+		if not is_instance_valid(inimigo) or inimigo == self:
+			continue
+		var inimigo_3d: Node3D = inimigo as Node3D
+		if inimigo_3d == null:
+			continue
+		var distancia_horizontal: float = Vector2(inimigo_3d.global_position.x - global_position.x, inimigo_3d.global_position.z - global_position.z).length()
+		if distancia_horizontal <= shot_range:
+			alvos.append(inimigo_3d)
+	return alvos
+
+func _executar_pulso_tesla() -> void:
+	var alvos := _inimigos_na_area()
+	if alvos.is_empty():
+		return
+	for alvo in alvos:
+		if alvo.has_method("take_damage"):
+			alvo.call("take_damage", damage)
+		if alvo.has_method("aplicar_lentidao"):
+			alvo.call("aplicar_lentidao", 0.5, 1.5)
+	_desenhar_raios_tesla(alvos)
+
+func _executar_pulso_chamas() -> void:
+	var alvos := _inimigos_na_area()
+	if alvos.is_empty():
+		return
+	for alvo in alvos:
+		if alvo.has_method("take_damage"):
+			alvo.call("take_damage", damage)
+	_mostrar_pulso_chamas()
+
+func _adicionar_modulos_chamas() -> void:
+	var modelo := get_node_or_null("Modelo") as Node3D
+	if modelo == null:
+		return
+	for lado in [-1.0, 1.0]:
+		_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(lado * 0.62, 0.72, 0.1), Vector3(0.24, 0.8, 0.24), Color(0.8, 0.25, 0.08, 1.0))
+	modelo_melhorado = true
+
+func _mostrar_pulso_chamas() -> void:
+	var malha_pulso := TorusMesh.new()
+	malha_pulso.inner_radius = 0.72
+	malha_pulso.outer_radius = 0.82
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.albedo_color = Color(1.0, 0.32, 0.06, 0.68)
+	material.emission_enabled = true
+	material.emission = Color(1.0, 0.22, 0.025, 1.0)
+	material.emission_energy_multiplier = 2.0
+	var efeito := MeshInstance3D.new()
+	efeito.name = "PulsoChamas"
+	efeito.mesh = malha_pulso
+	efeito.material_override = material
+	efeito.scale = Vector3.ONE * (shot_range / 0.82)
+	efeito.position.y = -0.82
+	add_child(efeito)
+	var temporizador := Timer.new()
+	temporizador.one_shot = true
+	temporizador.wait_time = 0.18
+	temporizador.timeout.connect(efeito.queue_free)
+	add_child(temporizador)
+	temporizador.start()
+
+func _desenhar_raios_tesla(alvos: Array[Node3D]) -> void:
+	var malha_raios := ImmediateMesh.new()
+	var material := StandardMaterial3D.new()
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.albedo_color = Color(0.26, 0.9, 1.0, 1.0)
+	material.emission_enabled = true
+	material.emission = Color(0.12, 0.7, 1.0, 1.0)
+	material.emission_energy_multiplier = 3.0
+	malha_raios.surface_begin(Mesh.PRIMITIVE_LINES, material)
+	for alvo in alvos:
+		malha_raios.surface_add_vertex(Vector3(0.0, 1.8, 0.0))
+		malha_raios.surface_add_vertex(to_local(alvo.global_position + Vector3.UP * 0.45))
+	malha_raios.surface_end()
+	var efeito := MeshInstance3D.new()
+	efeito.name = "RaioTesla"
+	efeito.mesh = malha_raios
+	add_child(efeito)
+	var temporizador := Timer.new()
+	temporizador.one_shot = true
+	temporizador.wait_time = 0.14
+	temporizador.timeout.connect(efeito.queue_free)
+	add_child(temporizador)
+	temporizador.start()
 
 
 func _atirar_no_alvo(target: Node3D) -> void:
@@ -281,16 +463,15 @@ func _criar_visual_de_alcance() -> void:
 		remove_child(indicador_existente)
 		indicador_existente.queue_free()
 
-	var segmentos := 64
-	var espessura := 0.07
+	var segmentos: int = 72
+	var espessura: float = 0.055
 	var vertices := PackedVector3Array()
 	var indices := PackedInt32Array()
 	var raio_interno := maxf(0.0, shot_range - espessura)
-	var meia_abertura := deg_to_rad(sector_angle_degrees * 0.5)
 
 	for i in range(segmentos):
-		var angulo_inicial := -meia_abertura + sector_angle_degrees * PI / 180.0 * float(i) / float(segmentos)
-		var angulo_final := -meia_abertura + sector_angle_degrees * PI / 180.0 * float(i + 1) / float(segmentos)
+		var angulo_inicial: float = TAU * float(i) / float(segmentos)
+		var angulo_final: float = TAU * float(i + 1) / float(segmentos)
 		var direcao_inicial := Vector3(sin(angulo_inicial), 0.0, -cos(angulo_inicial))
 		var direcao_final := Vector3(sin(angulo_final), 0.0, -cos(angulo_final))
 		var base := vertices.size()
@@ -300,34 +481,29 @@ func _criar_visual_de_alcance() -> void:
 		vertices.append(direcao_final * raio_interno)
 		indices.append_array(PackedInt32Array([base, base + 1, base + 2, base + 1, base + 3, base + 2]))
 
-	for angulo in [-meia_abertura, meia_abertura]:
-		var direcao := Vector3(sin(angulo), 0.0, -cos(angulo))
-		var lateral := Vector3(-direcao.z, 0.0, direcao.x).normalized() * espessura * 0.5
-		var base := vertices.size()
-		vertices.append(lateral)
-		vertices.append(-lateral)
-		vertices.append(direcao * shot_range + lateral)
-		vertices.append(direcao * shot_range - lateral)
-		indices.append_array(PackedInt32Array([base, base + 1, base + 2, base + 1, base + 3, base + 2]))
-
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
 	arrays[Mesh.ARRAY_INDEX] = indices
-	var setor := ArrayMesh.new()
-	setor.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
+	var circulo := ArrayMesh.new()
+	circulo.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var material := StandardMaterial3D.new()
 	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
 	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
 	material.cull_mode = BaseMaterial3D.CULL_DISABLED
-	material.albedo_color = Color(0.18, 0.82, 1.0, 0.8)
-	setor.surface_set_material(0, material)
+	var cor_alcance := Color(0.18, 0.82, 1.0, 0.8)
+	if tipo_torre == "rapida":
+		cor_alcance = Color(1.0, 0.55, 0.22, 0.8)
+	elif tipo_torre == "chama":
+		cor_alcance = Color(1.0, 0.38, 0.12, 0.8)
+	material.albedo_color = cor_alcance
+	circulo.surface_set_material(0, material)
 
 	var visual := MeshInstance3D.new()
 	visual.name = "IndicadorAlcance"
 	visual.top_level = true
-	visual.mesh = setor
+	visual.mesh = circulo
 	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(visual)
 	visual.global_position = global_position + Vector3.UP * -0.98
-	visual.global_rotation = Vector3(0.0, atan2(-direcao_setor_global.x, -direcao_setor_global.z), 0.0)
+	visual.global_rotation = Vector3.ZERO
