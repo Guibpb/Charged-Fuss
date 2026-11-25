@@ -4,6 +4,18 @@ const ENEMY_SCENE = preload("res://Enemy.tscn")
 const METRICA_MAPA = preload("res://MetricaMapa.gd")
 const BASIC_TOWER_COST = 60
 const FAST_TOWER_COST = 75
+const UPGRADE_COSTS: Dictionary = {
+	"dano": 40,
+	"alcance": 30,
+	"velocidade": 55,
+	"balas": 65,
+}
+const UPGRADE_NAMES: Dictionary = {
+	"dano": "Mais dano",
+	"alcance": "Alcance +",
+	"velocidade": "Velocidade +",
+	"balas": "Balas ×2",
+}
 const TOTAL_RODADAS: int = 10
 const INIMIGOS_POR_RODADA: Array[int] = [4, 5, 15, 15, 25, 30, 35, 40, 50, 50]
 const ENERGIA_POR_DERROTA: int = 1
@@ -71,6 +83,12 @@ const TUTORIAIS_RODADA: Array[String] = [
 @onready var tela_derrota: Control = $HUD/TelaDerrota
 
 var tipos_ativados: Array[String] = ["", "", "", ""]
+var upgrades_comprados: Array[Dictionary] = [
+	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
+	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
+	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
+	{"dano": false, "alcance": false, "velocidade": false, "balas": false},
+]
 var partida_iniciada := false
 var rodada_atual: int = 0
 var inimigos_restantes: int = 0
@@ -414,7 +432,10 @@ func _on_gerenciar_torres_pressed() -> void:
 	menu_torres.show()
 
 func _ativar_torre(indice: int, tipo: String) -> void:
-	if indice < 0 or indice >= torres.size() or not tipos_ativados[indice].is_empty():
+	if indice < 0 or indice >= torres.size():
+		return
+	if not tipos_ativados[indice].is_empty():
+		_comprar_upgrade(indice, tipo)
 		return
 
 	var custo := BASIC_TOWER_COST if tipo == "basica" else FAST_TOWER_COST
@@ -432,6 +453,27 @@ func _ativar_torre(indice: int, tipo: String) -> void:
 	_atualizar_economia()
 	if not partida_iniciada:
 		_iniciar_fase()
+
+func _comprar_upgrade(indice: int, botao_tipo: String) -> void:
+	var tipo_torre := tipos_ativados[indice]
+	var melhoria := ""
+	if tipo_torre == "rapida":
+		melhoria = "velocidade" if botao_tipo == "basica" else "balas"
+	else:
+		melhoria = "dano" if botao_tipo == "basica" else "alcance"
+
+	var custo := int(UPGRADE_COSTS[melhoria])
+	if upgrades_comprados[indice][melhoria]:
+		return
+	if player_energy < custo:
+		status_ativacao.text = "Energia insuficiente. Você precisa de %d E." % custo
+		return
+
+	torres[indice].call("aplicar_upgrade", melhoria)
+	upgrades_comprados[indice][melhoria] = true
+	player_energy -= custo
+	status_ativacao.text = "%s comprada para a torre %d por %d E." % [UPGRADE_NAMES[melhoria], indice + 1, custo]
+	_atualizar_economia()
 
 func _ao_clicar_torre(_camera_evento: Camera3D, evento: InputEvent, _posicao: Vector3, _normal: Vector3, _indice_forma: int, indice: int) -> void:
 	if not evento is InputEventMouseButton:
@@ -475,12 +517,26 @@ func _atualizar_economia() -> void:
 		if tipo.is_empty():
 			status_torres[indice].text = "TORRE %02d  •  DESLIGADA" % (indice + 1)
 			status_torres[indice].add_theme_color_override("font_color", Color(0.62, 0.7, 0.74, 1))
+			botao_ativar_basica[indice].add_theme_font_size_override("font_size", 14)
+			botao_ativar_rapida[indice].add_theme_font_size_override("font_size", 14)
+			botao_ativar_basica[indice].text = "Normal · %d E" % BASIC_TOWER_COST
+			botao_ativar_rapida[indice].text = "Rápida · %d E" % FAST_TOWER_COST
+			botao_ativar_basica[indice].disabled = player_energy < BASIC_TOWER_COST
+			botao_ativar_rapida[indice].disabled = player_energy < FAST_TOWER_COST
 		else:
 			var nome_tipo := "rápida" if tipo == "rapida" else "normal"
-			status_torres[indice].text = "TORRE %02d  •  %s" % [indice + 1, nome_tipo.to_upper()]
+			var tipo_melhoria_1 := "velocidade" if tipo == "rapida" else "dano"
+			var tipo_melhoria_2 := "balas" if tipo == "rapida" else "alcance"
+			var tem_melhoria: bool = bool(upgrades_comprados[indice][tipo_melhoria_1]) or bool(upgrades_comprados[indice][tipo_melhoria_2])
+			var estado := nome_tipo.to_upper() + (" +" if tem_melhoria else "")
+			status_torres[indice].text = "TORRE %02d  •  %s" % [indice + 1, estado]
 			status_torres[indice].add_theme_color_override("font_color", Color(0.4, 0.88, 0.84, 1))
-		botao_ativar_basica[indice].disabled = not tipo.is_empty() or player_energy < BASIC_TOWER_COST
-		botao_ativar_rapida[indice].disabled = not tipo.is_empty() or player_energy < FAST_TOWER_COST
+			botao_ativar_basica[indice].add_theme_font_size_override("font_size", 12)
+			botao_ativar_rapida[indice].add_theme_font_size_override("font_size", 12)
+			botao_ativar_basica[indice].text = "%s\n%d E%s" % [UPGRADE_NAMES[tipo_melhoria_1], UPGRADE_COSTS[tipo_melhoria_1], " ✓" if upgrades_comprados[indice][tipo_melhoria_1] else ""]
+			botao_ativar_rapida[indice].text = "%s\n%d E%s" % [UPGRADE_NAMES[tipo_melhoria_2], UPGRADE_COSTS[tipo_melhoria_2], " ✓" if upgrades_comprados[indice][tipo_melhoria_2] else ""]
+			botao_ativar_basica[indice].disabled = upgrades_comprados[indice][tipo_melhoria_1] or player_energy < UPGRADE_COSTS[tipo_melhoria_1]
+			botao_ativar_rapida[indice].disabled = upgrades_comprados[indice][tipo_melhoria_2] or player_energy < UPGRADE_COSTS[tipo_melhoria_2]
 
 	if partida_iniciada:
 		botao_jogo.text = "FECHAR PAINEL"
@@ -506,7 +562,7 @@ func _configurar_camera() -> void:
 	var largura_controles := largura_view * METRICA_MAPA.FRACAO_CONTROLES
 	var deslocamento_camera := Vector3(13.0, 20.0, 18.0)
 	var eixo_direita_camera := Vector3(deslocamento_camera.z, 0.0, -deslocamento_camera.x).normalized()
-	var centro_mapa := Vector3(-largura_controles * 0.5, malha_chao.global_position.y, 0.0) - eixo_direita_camera * 4.0
+	var centro_mapa := Vector3(-largura_controles * 0.5, malha_chao.global_position.y, 0.0) - eixo_direita_camera * 6.0
 	camera.global_position = centro_mapa + deslocamento_camera
 	camera.look_at(centro_mapa, Vector3.UP)
 	var plano := malha_chao.mesh as PlaneMesh

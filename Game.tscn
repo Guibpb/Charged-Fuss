@@ -2,6 +2,10 @@
 
 [ext_resource type="Script" uid="uid://cake722v5sjk4" path="res://Cena.gd" id="1_u44n3"]
 [ext_resource type="PackedScene" uid="uid://makero5ca6aw" path="res://TorreBasica.tscn" id="2_torre"]
+[ext_resource type="FontFile" path="res://fonts/Orbitron-Black.ttf" id="3_font_black"]
+[ext_resource type="FontFile" path="res://fonts/Orbitron-Bold.ttf" id="4_font_bold"]
+[ext_resource type="FontFile" path="res://fonts/Orbitron-Medium.ttf" id="5_font_medium"]
+[ext_resource type="FontFile" path="res://fonts/Orbitron-Regular.ttf" id="6_font_regular"]
 
 [sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vtaim"]
 
@@ -112,7 +116,10 @@ corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
 [sub_resource type="Theme" id="Theme_interface"]
+default_font = ExtResource("6_font_regular")
 default_font_size = 16
+Button/fonts/font = ExtResource("5_font_medium")
+Label/fonts/font = ExtResource("6_font_regular")
 Button/colors/font_color = Color(0.88, 0.94, 0.97, 1)
 Button/colors/font_disabled_color = Color(0.49, 0.59, 0.63, 1)
 Button/colors/font_hover_color = Color(0.96, 1, 1, 1)
@@ -214,6 +221,7 @@ transform = Transform3D(1.1924881e-08, 0, -1, 0, 1, 0, 1, 0, 1.1924881e-08, -5.3
 
 [node name="Identificador" type="Label3D" parent="Torre1" unique_id=653361089]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5494039, 0)
+font = ExtResource("3_font_black")
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -226,6 +234,7 @@ transform = Transform3D(1, 0, 1.7484555e-07, 0, 1, 0, -1.7484555e-07, 0, 1, -17.
 
 [node name="Identificador" type="Label3D" parent="Torre2" unique_id=989446483]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5947506, 0)
+font = ExtResource("3_font_black")
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -238,6 +247,7 @@ transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 8.4,
 
 [node name="Identificador" type="Label3D" parent="Torre3" unique_id=824776278]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5809634, 0)
+font = ExtResource("3_font_black")
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -250,6 +260,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.4, 1.12, 9)
 
 [node name="Identificador" type="Label3D" parent="Torre4" unique_id=1900501869]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5745323, 0)
+font = ExtResource("3_font_black")
 pixel_size = 0.007
 billboard = 1
 outline_modulate = Color(0.035, 0.055, 0.07, 1)
@@ -284,6 +295,7 @@ offset_left = 28.0
 offset_top = 21.0
 offset_right = 284.0
 offset_bottom = 64.0
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
 theme_override_constants/outline_size = 3
@@ -299,6 +311,7 @@ offset_left = -202.0
 offset_top = 20.0
 offset_right = -24.0
 offset_bottom = 58.0
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_colors/font_color = Color(0.35, 0.95, 1, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
 theme_override_constants/outline_size = 3
@@ -315,6 +328,7 @@ offset_left = -384.0
 offset_top = 70.0
 offset_right = -20.0
 offset_bottom = 98.0
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_colors/font_color = Color(0.55, 0.96, 0.68, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
 theme_override_constants/outline_size = 3
@@ -340,6 +354,7 @@ offset_left = 10.0
 offset_top = 5.0
 offset_right = 206.0
 offset_bottom = 51.0
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
 theme_override_constants/outline_size = 3
@@ -357,6 +372,7 @@ offset_left = -250.0
 offset_top = 166.0
 offset_right = -184.0
 offset_bottom = 214.0
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_colors/font_color = Color(0.38, 0.9, 0.92, 1)
 theme_override_colors/font_outline_color = Color(0.02, 0.07, 0.09, 1)
 theme_override_constants/outline_size = 3
@@ -439,6 +455,7 @@ alignment = 1
 
 [node name="Titulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=398344981]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("3_font_black")
 theme_override_colors/font_color = Color(0.91, 0.96, 0.92, 1)
 theme_override_font_sizes/font_size = 58
 text = "Tower Defense"
@@ -446,6 +463,7 @@ horizontal_alignment = 1
 
 [node name="Subtitulo" type="Label" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=2137112215]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_colors/font_color = Color(0.34, 0.83, 0.86, 1)
 theme_override_font_sizes/font_size = 16
 text = "INICIAÇÃO"
@@ -454,6 +472,7 @@ horizontal_alignment = 1
 [node name="Play" type="Button" parent="HUD/MenuInicial/Centralizar/Conteudo" unique_id=232377009]
 custom_minimum_size = Vector2(270, 64)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 22
 text = "INICIAR PARTIDA"
 
@@ -502,9 +521,10 @@ theme_override_constants/separation = 8
 
 [node name="Titulo" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=818158494]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_colors/font_color = Color(0.45, 0.9, 0.91, 1)
 theme_override_font_sizes/font_size = 21
-text = "ATIVAÇÃO DAS TORRES"
+text = "TORRES E MELHORIAS"
 horizontal_alignment = 1
 
 [node name="Instrucao" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=7650161]
@@ -512,7 +532,7 @@ custom_minimum_size = Vector2(280, 54)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.67, 0.76, 0.8, 1)
 theme_override_font_sizes/font_size = 14
-text = "Ative as torres com energia. As desligadas não atacam."
+text = "Ative torres e compre melhorias. As desligadas não atacam."
 autowrap_mode = 3
 
 [node name="Torre1" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1131273396]
@@ -521,6 +541,7 @@ theme_override_constants/separation = 4
 
 [node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre1" unique_id=933068958]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_font_sizes/font_size = 16
 text = "Torre 1 — desligada"
 
@@ -529,15 +550,15 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre1/Linha" unique_id=425131518]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre1/Linha" unique_id=374466045]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Rápida · 75 E"
 
 [node name="Torre2" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=594859940]
@@ -546,6 +567,7 @@ theme_override_constants/separation = 4
 
 [node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre2" unique_id=831717780]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_font_sizes/font_size = 16
 text = "Torre 2 — desligada"
 
@@ -554,15 +576,15 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre2/Linha" unique_id=1690856512]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre2/Linha" unique_id=1632738381]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Rápida · 75 E"
 
 [node name="Torre3" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=225011041]
@@ -571,6 +593,7 @@ theme_override_constants/separation = 4
 
 [node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre3" unique_id=1422681591]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_font_sizes/font_size = 16
 text = "Torre 3 — desligada"
 
@@ -579,15 +602,15 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre3/Linha" unique_id=1331246307]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre3/Linha" unique_id=720651714]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Rápida · 75 E"
 
 [node name="Torre4" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1878550307]
@@ -596,6 +619,7 @@ theme_override_constants/separation = 4
 
 [node name="Estado" type="Label" parent="HUD/MenuTorres/Painel/Conteudo/Torre4" unique_id=307659186]
 layout_mode = 2
+theme_override_fonts/font = ExtResource("5_font_medium")
 theme_override_font_sizes/font_size = 16
 text = "Torre 4 — desligada"
 
@@ -604,15 +628,15 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="AtivarBasica" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre4/Linha" unique_id=63946675]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre4/Linha" unique_id=921566877]
-custom_minimum_size = Vector2(130, 44)
+custom_minimum_size = Vector2(130, 52)
 layout_mode = 2
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 12
 text = "Rápida · 75 E"
 
 [node name="Status" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=853670083]
@@ -672,6 +696,7 @@ offset_right = -24.0
 offset_bottom = -96.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_fonts/font = ExtResource("3_font_black")
 theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
 theme_override_constants/outline_size = 3
@@ -697,12 +722,14 @@ alignment = 1
 [node name="Recomecar" type="Button" parent="HUD/TelaDerrota/Cartao/Acoes" unique_id=1811326917]
 custom_minimum_size = Vector2(200, 54)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 18
 text = "RECOMEÇAR"
 
 [node name="Sair" type="Button" parent="HUD/TelaDerrota/Cartao/Acoes" unique_id=1105188148]
 custom_minimum_size = Vector2(200, 54)
 layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 18
 text = "SAIR"
 

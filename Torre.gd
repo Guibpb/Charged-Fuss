@@ -3,10 +3,16 @@ extends CharacterBody3D
 @export var shot_range: float = 5.5
 @export var sector_angle_degrees: float = 100.0
 @export var shot_interval: float = 1.0
-@export var damage: int = 25
+@export var damage: int = 35
 @export var projectile_scene: PackedScene = preload("res://Projectile.tscn")
 
+const TURRET_UP_SCENE: PackedScene = preload("res://modelos/TurretUp.glb")
+
 var active := false
+var torre_rapida := false
+var modelo_melhorado := false
+var balas_por_disparo: int = 1
+var dano_normal_configurado: int = 0
 var shot_timer := 0.0
 var velocidade_rotacao: float = 20.0
 var direcao_setor_global: Vector3 = Vector3(0.0, 0.0, -1.0)
@@ -21,6 +27,7 @@ const DESLOCAMENTO_FRENTE_MODELO: float = PI * 0.5
 func _ready() -> void:
 	add_to_group("torres")
 	set_physics_process(false)
+	dano_normal_configurado = damage
 	_preparar_modelo_torre()
 	_atualizar_cor(Color(0.34, 0.37, 0.39, 1.0))
 
@@ -47,15 +54,19 @@ func _preparar_modelo_torre() -> void:
 	var marcador := Node3D.new()
 	marcador.name = "PontoDisparo"
 	pivo.add_child(marcador)
+	var comprimento_canhao := 3.4 if modelo_melhorado else COMPRIMENTO_CANHAO_MODELO
+	var altura_total := 3.0 if modelo_melhorado else ALTURA_TOTAL_MODELO
 	marcador.position = Vector3(
-		COMPRIMENTO_CANHAO_MODELO * escala_modelo,
-		(ALTURA_TOTAL_MODELO - ALTURA_EIXO_MODELO) * escala_modelo,
+		comprimento_canhao * escala_modelo,
+		(altura_total - ALTURA_EIXO_MODELO) * escala_modelo,
 		0.0
 	)
 	ponto_disparo = marcador
+	parte_superior_rotativa.global_rotation.y = global_rotation.y + DESLOCAMENTO_FRENTE_MODELO
 
 func ativar(rapida: bool) -> void:
 	active = true
+	torre_rapida = rapida
 	if rapida:
 		shot_range = 4.5
 		sector_angle_degrees = 60.0
@@ -66,11 +77,62 @@ func ativar(rapida: bool) -> void:
 		shot_range = 5.5
 		sector_angle_degrees = 100.0
 		shot_interval = 0.8
-		damage = 25
+		damage = dano_normal_configurado
 		_atualizar_cor(Color(0.18, 0.58, 0.78, 1.0))
 	shot_timer = 0.0
 	_criar_visual_de_alcance()
 	set_physics_process(true)
+
+func aplicar_upgrade(tipo_upgrade: String) -> void:
+	match tipo_upgrade:
+		"dano":
+			damage = roundi(float(damage) * 1.5)
+		"alcance":
+			shot_range *= 1.5
+		"velocidade":
+			shot_interval /= 1.5
+		"balas":
+			balas_por_disparo = 2
+		_:
+			return
+	_substituir_modelo_por_upgrade()
+	
+func _substituir_modelo_por_upgrade() -> void:
+	if modelo_melhorado:
+		return
+	var modelo := get_node_or_null("Modelo") as Node3D
+	if modelo == null:
+		return
+
+	var indicador := get_node_or_null("IndicadorAlcance") as MeshInstance3D
+	var indicador_estava_visivel := indicador != null and indicador.visible
+	if parte_superior_rotativa != null:
+		remove_child(parte_superior_rotativa)
+		parte_superior_rotativa.queue_free()
+	parte_superior_rotativa = null
+	ponto_disparo = null
+
+	var modelo_anterior := modelo.get_node_or_null("Turret1")
+	if modelo_anterior != null:
+		modelo.remove_child(modelo_anterior)
+		modelo_anterior.queue_free()
+
+	modelo.position.z = 0.0
+	var novo_modelo := TURRET_UP_SCENE.instantiate() as Node3D
+	if novo_modelo == null:
+		push_error("Não foi possível carregar o modelo TurretUp.glb.")
+		return
+	novo_modelo.name = "TurretUp"
+	modelo.add_child(novo_modelo)
+	modelo_melhorado = true
+	_preparar_modelo_torre()
+	_atualizar_cor(Color(1.0, 0.56, 0.2, 1.0) if torre_rapida else Color(0.18, 0.58, 0.78, 1.0))
+	definir_direcao_setor(direcao_setor_global)
+
+	_criar_visual_de_alcance()
+	var novo_indicador := get_node_or_null("IndicadorAlcance") as MeshInstance3D
+	if novo_indicador != null and not indicador_estava_visivel:
+		novo_indicador.hide()
 
 func definir_direcao_setor(direcao: Vector3) -> void:
 	direcao.y = 0.0
@@ -145,13 +207,20 @@ func _atirar_no_alvo(target: Node3D) -> void:
 	var origem := global_position + Vector3.UP * 0.2
 	if ponto_disparo != null:
 		origem = ponto_disparo.global_position
-	var direction: Vector3 = (target.global_position - origem).normalized()
-	var projectile = projectile_scene.instantiate()
-	projectile.shooter = self
-	projectile.damage = damage
-	get_tree().current_scene.add_child(projectile)
-	projectile.global_position = origem
-	projectile.direction = direction
+	var direcao_base: Vector3 = (target.global_position - origem).normalized()
+	var lateral := Vector3(direcao_base.z, 0.0, -direcao_base.x).normalized()
+	if lateral.length_squared() < 0.0001:
+		lateral = Vector3.RIGHT
+	for indice_bala in range(balas_por_disparo):
+		var deslocamento_lateral := (float(indice_bala) - float(balas_por_disparo - 1) * 0.5) * 0.18
+		var origem_bala := origem + lateral * deslocamento_lateral
+		var direction: Vector3 = (target.global_position - origem_bala).normalized()
+		var projectile = projectile_scene.instantiate()
+		projectile.shooter = self
+		projectile.damage = damage
+		get_tree().current_scene.add_child(projectile)
+		projectile.global_position = origem_bala
+		projectile.direction = direction
 	shot_timer = shot_interval
 
 func _atualizar_cor(cor: Color) -> void:
@@ -172,6 +241,7 @@ func _atualizar_cor(cor: Color) -> void:
 func _criar_visual_de_alcance() -> void:
 	var indicador_existente := get_node_or_null("IndicadorAlcance") as MeshInstance3D
 	if indicador_existente != null:
+		remove_child(indicador_existente)
 		indicador_existente.queue_free()
 
 	var segmentos := 64
