@@ -24,13 +24,14 @@ const ALTURA_TOTAL_MODELO: float = 2.94
 const COMPRIMENTO_CANHAO_MODELO: float = 2.8
 const DESLOCAMENTO_FRENTE_MODELO: float = PI * 0.5
 const ESCALA_MODELO_MELHORADO: float = 1.35
+const INCLINACAO_DESLIGADA: float = -0.314159265
 
 func _ready() -> void:
 	add_to_group("torres")
 	set_physics_process(false)
 	dano_normal_configurado = damage
 	_preparar_modelo_torre()
-	_atualizar_cor(Color(0.34, 0.37, 0.39, 1.0))
+	_atualizar_cor(Color(0.48, 0.51, 0.54, 1.0), 0.28)
 
 func _preparar_modelo_torre() -> void:
 	var modelo := get_node_or_null("Modelo") as Node3D
@@ -64,22 +65,29 @@ func _preparar_modelo_torre() -> void:
 	)
 	ponto_disparo = marcador
 	parte_superior_rotativa.global_rotation.y = global_rotation.y + DESLOCAMENTO_FRENTE_MODELO
+	_ajustar_inclinacao_superior()
+
+func _ajustar_inclinacao_superior() -> void:
+	if parte_superior_rotativa == null:
+		return
+	parte_superior_rotativa.rotation.z = 0.0 if active else INCLINACAO_DESLIGADA
 
 func ativar(rapida: bool) -> void:
 	active = true
 	torre_rapida = rapida
+	_ajustar_inclinacao_superior()
 	if rapida:
 		shot_range = 4.5
 		sector_angle_degrees = 60.0
 		shot_interval = 0.2
 		damage = 10
-		_atualizar_cor(Color(1.0, 0.56, 0.2, 1.0))
+		_atualizar_cor(Color(0.88, 0.5, 0.24, 1.0), 0.15)
 	else:
 		shot_range = 5.5
 		sector_angle_degrees = 100.0
 		shot_interval = 0.8
 		damage = dano_normal_configurado
-		_atualizar_cor(Color(0.18, 0.58, 0.78, 1.0))
+		_atualizar_cor(Color(0.28, 0.55, 0.72, 1.0), 0.15)
 	shot_timer = 0.0
 	_criar_visual_de_alcance()
 	set_physics_process(true)
@@ -147,7 +155,10 @@ func _substituir_modelo_por_upgrade() -> void:
 	var identificador := get_node_or_null("Identificador") as Label3D
 	if identificador != null:
 		identificador.position.y = 2.45
-	_atualizar_cor(Color(1.0, 0.56, 0.2, 1.0) if torre_rapida else Color(0.18, 0.58, 0.78, 1.0))
+	if torre_rapida:
+		_atualizar_cor(Color(0.88, 0.5, 0.24, 1.0), 0.15)
+	else:
+		_atualizar_cor(Color(0.28, 0.55, 0.72, 1.0), 0.15)
 	definir_direcao_setor(direcao_setor_global)
 
 	_criar_visual_de_alcance()
@@ -164,6 +175,7 @@ func definir_direcao_setor(direcao: Vector3) -> void:
 	global_rotation.y = yaw
 	if parte_superior_rotativa != null:
 		parte_superior_rotativa.global_rotation.y = yaw + DESLOCAMENTO_FRENTE_MODELO
+		_ajustar_inclinacao_superior()
 
 func _physics_process(delta: float) -> void:
 	if not active:
@@ -244,20 +256,24 @@ func _atirar_no_alvo(target: Node3D) -> void:
 		projectile.direction = direction
 	shot_timer = shot_interval
 
-func _atualizar_cor(cor: Color) -> void:
-	var visual := get_node_or_null("MeshInstance3D") as MeshInstance3D
-	if visual == null:
-		for parte in find_children("*", "MeshInstance3D", true, false):
-			if not String(parte.name).to_lower().contains("neon"):
-				continue
+func _atualizar_cor(cor: Color, intensidade_tinta: float = 0.15) -> void:
+	for parte in find_children("*", "MeshInstance3D", true, false):
+		var visual := parte as MeshInstance3D
+		var nome_parte := String(visual.name).to_lower()
+		if visual.mesh == null or nome_parte.contains("indicadoralcance"):
+			continue
+
+		var sobreposicao := StandardMaterial3D.new()
+		sobreposicao.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		sobreposicao.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		sobreposicao.albedo_color = Color(cor.r, cor.g, cor.b, intensidade_tinta)
+		visual.material_overlay = sobreposicao
+
+		if nome_parte.contains("neon"):
 			var material_neon := StandardMaterial3D.new()
 			material_neon.albedo_color = cor
 			material_neon.roughness = 0.35
-			(parte as MeshInstance3D).material_override = material_neon
-		return
-	var material := StandardMaterial3D.new()
-	material.albedo_color = cor
-	visual.material_override = material
+			visual.material_override = material_neon
 
 func _criar_visual_de_alcance() -> void:
 	var indicador_existente := get_node_or_null("IndicadorAlcance") as MeshInstance3D

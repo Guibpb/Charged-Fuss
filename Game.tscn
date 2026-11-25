@@ -725,6 +725,7 @@ theme_override_font_sizes/font_size = 18
 text = "INICIAR PARTIDA"
 
 [node name="TelaDerrota" type="Control" parent="HUD" unique_id=2093755916]
+process_mode = 3
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -741,7 +742,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0.004, 0.008, 0.012, 1)
+color = Color(0.12, 0.012, 0.028, 0.88)
 
 [node name="Cartao" type="Panel" parent="HUD/TelaDerrota" unique_id=447043157]
 layout_mode = 0

@@ -311,10 +311,11 @@ func _encerrar_fase(vitoria: bool) -> void:
 		rodada_label.text = "FASE CONCLUÍDA"
 	else:
 		rodada_label.text = "FIM DE JOGO"
-		tela_derrota.show()
 	get_tree().paused = true
 	if vitoria:
 		_mostrar_tela_vitoria_com_transicao()
+	else:
+		_mostrar_tela_derrota_com_transicao()
 
 func _mostrar_tela_vitoria_com_transicao() -> void:
 	await get_tree().create_timer(0.8, true, false, true).timeout
@@ -325,6 +326,16 @@ func _mostrar_tela_vitoria_com_transicao() -> void:
 	transicao.set_trans(Tween.TRANS_CUBIC)
 	transicao.set_ease(Tween.EASE_OUT)
 	transicao.tween_property(tela_vitoria, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.8)
+
+func _mostrar_tela_derrota_com_transicao() -> void:
+	await get_tree().create_timer(0.8, true, false, true).timeout
+	tela_derrota.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	tela_derrota.show()
+	var transicao: Tween = create_tween()
+	transicao.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	transicao.set_trans(Tween.TRANS_CUBIC)
+	transicao.set_ease(Tween.EASE_OUT)
+	transicao.tween_property(tela_derrota, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.8)
 
 func _recomecar_jogo() -> void:
 	get_tree().paused = false
