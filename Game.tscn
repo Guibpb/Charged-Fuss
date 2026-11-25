@@ -532,13 +532,13 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Normal · 75 E"
+text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre1/Linha" unique_id=374466045]
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Rápida · 60 E"
+text = "Rápida · 75 E"
 
 [node name="Torre2" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=594859940]
 layout_mode = 2
@@ -557,13 +557,13 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Normal · 75 E"
+text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre2/Linha" unique_id=1632738381]
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Rápida · 60 E"
+text = "Rápida · 75 E"
 
 [node name="Torre3" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=225011041]
 layout_mode = 2
@@ -582,13 +582,13 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Normal · 75 E"
+text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre3/Linha" unique_id=720651714]
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Rápida · 60 E"
+text = "Rápida · 75 E"
 
 [node name="Torre4" type="VBoxContainer" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=1878550307]
 layout_mode = 2
@@ -607,13 +607,13 @@ theme_override_constants/separation = 8
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Normal · 75 E"
+text = "Normal · 60 E"
 
 [node name="AtivarRapida" type="Button" parent="HUD/MenuTorres/Painel/Conteudo/Torre4/Linha" unique_id=921566877]
 custom_minimum_size = Vector2(130, 44)
 layout_mode = 2
 theme_override_font_sizes/font_size = 16
-text = "Rápida · 60 E"
+text = "Rápida · 75 E"
 
 [node name="Status" type="Label" parent="HUD/MenuTorres/Painel/Conteudo" unique_id=853670083]
 custom_minimum_size = Vector2(280, 42)
@@ -629,7 +629,7 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 18
 text = "INICIAR PARTIDA"
 
-[node name="TelaDerrota" type="Control" parent="HUD"]
+[node name="TelaDerrota" type="Control" parent="HUD" unique_id=2093755916]
 visible = false
 layout_mode = 3
 anchors_preset = 15
@@ -637,33 +637,31 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 theme = SubResource("Theme_interface")
 
-[node name="Fundo" type="ColorRect" parent="HUD/TelaDerrota"]
+[node name="Fundo" type="ColorRect" parent="HUD/TelaDerrota" unique_id=1822071048]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-mouse_filter = 0
 color = Color(0.004, 0.008, 0.012, 1)
 
-[node name="Cartao" type="Panel" parent="HUD/TelaDerrota"]
+[node name="Cartao" type="Panel" parent="HUD/TelaDerrota" unique_id=447043157]
 layout_mode = 0
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
 offset_left = -340.0
-offset_top = -100.0
+offset_top = -150.0
 offset_right = 340.0
-offset_bottom = 100.0
+offset_bottom = 150.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("StyleBoxFlat_painel_derrota")
 
-[node name="Mensagem" type="Label" parent="HUD/TelaDerrota/Cartao"]
+[node name="Mensagem" type="Label" parent="HUD/TelaDerrota/Cartao" unique_id=1015928310]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -671,7 +669,9 @@ anchor_bottom = 1.0
 offset_left = 24.0
 offset_top = 20.0
 offset_right = -24.0
-offset_bottom = -20.0
+offset_bottom = -96.0
+grow_horizontal = 2
+grow_vertical = 2
 theme_override_colors/font_color = Color(1, 0.18, 0.2, 1)
 theme_override_colors/font_outline_color = Color(0.12, 0.015, 0.02, 1)
 theme_override_constants/outline_size = 3
@@ -680,4 +680,32 @@ text = "Você Perdeu"
 horizontal_alignment = 1
 vertical_alignment = 1
 
+[node name="Acoes" type="HBoxContainer" parent="HUD/TelaDerrota/Cartao" unique_id=435799074]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -78.0
+offset_right = 220.0
+offset_bottom = -22.0
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Recomecar" type="Button" parent="HUD/TelaDerrota/Cartao/Acoes" unique_id=1811326917]
+custom_minimum_size = Vector2(200, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "RECOMEÇAR"
+
+[node name="Sair" type="Button" parent="HUD/TelaDerrota/Cartao/Acoes" unique_id=1105188148]
+custom_minimum_size = Vector2(200, 54)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "SAIR"
+
 [connection signal="pressed" from="HUD/MenuInicial/Centralizar/Conteudo/Play" to="." method="_on_menu_play_pressed"]
+[connection signal="pressed" from="HUD/TelaDerrota/Cartao/Acoes/Recomecar" to="." method="_recomecar_jogo"]
+[connection signal="pressed" from="HUD/TelaDerrota/Cartao/Acoes/Sair" to="." method="_sair_do_jogo"]

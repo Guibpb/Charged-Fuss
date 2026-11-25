@@ -2,10 +2,10 @@ extends Node3D
 
 const ENEMY_SCENE = preload("res://Enemy.tscn")
 const METRICA_MAPA = preload("res://MetricaMapa.gd")
-const BASIC_TOWER_COST = 75
-const FAST_TOWER_COST = 60
+const BASIC_TOWER_COST = 60
+const FAST_TOWER_COST = 75
 const TOTAL_RODADAS: int = 10
-const INIMIGOS_POR_RODADA: Array[int] = [5, 5, 15, 15, 25, 30, 35, 40, 50, 50]
+const INIMIGOS_POR_RODADA: Array[int] = [4, 5, 15, 15, 25, 30, 35, 40, 50, 50]
 const ENERGIA_POR_DERROTA: int = 1
 const BONUS_RODADA: int = 10
 const INTERVALOS_RODADA: Array[float] = [1.5, 1.5, 1.5, 0.8, 1.0, 1.5, 1.0, 0.8, 1.0, 1.0]
@@ -280,6 +280,14 @@ func _encerrar_fase(vitoria: bool) -> void:
 		rodada_label.text = "FIM DE JOGO"
 		tela_derrota.show()
 	get_tree().paused = true
+
+func _recomecar_jogo() -> void:
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	get_tree().reload_current_scene()
+
+func _sair_do_jogo() -> void:
+	get_tree().quit()
 
 func _alternar_pausa() -> void:
 	if not partida_iniciada or fase_encerrada:
