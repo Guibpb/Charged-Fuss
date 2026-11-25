@@ -3,7 +3,7 @@ extends CharacterBody3D
 @export var shot_range: float = 5.5
 @export var sector_angle_degrees: float = 100.0
 @export var shot_interval: float = 1.0
-@export var damage: int = 35
+@export var damage: int = 30
 @export var projectile_scene: PackedScene = preload("res://Projectile.tscn")
 
 const TURRET_UP_SCENE: PackedScene = preload("res://modelos/TurretUp.glb")
@@ -87,7 +87,7 @@ func ativar(rapida: bool) -> void:
 func aplicar_upgrade(tipo_upgrade: String) -> void:
 	match tipo_upgrade:
 		"dano":
-			damage = roundi(float(damage) * 1.5)
+			damage = roundi(float(damage) * 1.3)
 		"alcance":
 			if torre_rapida:
 				return

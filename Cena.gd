@@ -5,7 +5,7 @@ const METRICA_MAPA = preload("res://MetricaMapa.gd")
 const BASIC_TOWER_COST = 60
 const FAST_TOWER_COST = 75
 const UPGRADE_COSTS: Dictionary = {
-	"dano": 40,
+	"dano": 45,
 	"alcance": 30,
 	"velocidade": 55,
 	"balas": 65,
@@ -81,6 +81,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 @onready var camera: Camera3D = $Camera3D
 @onready var malha_chao: MeshInstance3D = $Chão/StaticBody3D/MeshInstance3D
 @onready var tela_derrota: Control = $HUD/TelaDerrota
+@onready var tela_vitoria: Control = $HUD/TelaVitoria
 
 var tipos_ativados: Array[String] = ["", "", "", ""]
 var upgrades_comprados: Array[Dictionary] = [
@@ -191,7 +192,7 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 		if eh_chefe:
 			enemy.call("configurar_como_chefe")
 		enemy.connect("reached_end", _on_enemy_reached_end.bind(eh_chefe))
-		enemy.connect("defeated", _on_enemy_defeated)
+		enemy.connect("defeated", _on_enemy_defeated.bind(eh_chefe))
 		path_follow.add_child(enemy)
 		_atualizar_hud_rodada()
 
@@ -207,19 +208,33 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 	_verificar_fim_rodada()
 
 func _on_enemy_reached_end(eh_chefe: bool) -> void:
-	var dano: int = 35 if eh_chefe else 1
+	var dano: int = 40 if eh_chefe else 1
 	player_health = maxi(0, player_health - dano)
 	_update_health_label()
 	if player_health <= 0:
 		_encerrar_fase(false)
 		return
+	if eh_chefe:
+		_vencer_nivel_pelo_chefe()
+		return
 	_resolver_inimigo()
 
-func _on_enemy_defeated() -> void:
+func _on_enemy_defeated(eh_chefe: bool) -> void:
 	player_energy += ENERGIA_POR_DERROTA
 	_mostrar_ganho_energia(ENERGIA_POR_DERROTA, false)
 	_atualizar_economia()
+	if eh_chefe:
+		_vencer_nivel_pelo_chefe()
+		return
 	_resolver_inimigo()
+
+func _vencer_nivel_pelo_chefe() -> void:
+	if rodada_atual >= TOTAL_RODADAS and not rodada_concluida:
+		rodada_concluida = true
+		player_energy += BONUS_RODADA
+		_mostrar_ganho_energia(BONUS_RODADA, true)
+		_atualizar_economia()
+	_encerrar_fase(true)
 
 func _mostrar_ganho_energia(quantidade: int, bonus_rodada: bool) -> void:
 	if bonus_rodada:
@@ -298,6 +313,18 @@ func _encerrar_fase(vitoria: bool) -> void:
 		rodada_label.text = "FIM DE JOGO"
 		tela_derrota.show()
 	get_tree().paused = true
+	if vitoria:
+		_mostrar_tela_vitoria_com_transicao()
+
+func _mostrar_tela_vitoria_com_transicao() -> void:
+	await get_tree().create_timer(0.8, true, false, true).timeout
+	tela_vitoria.modulate = Color(1.0, 1.0, 1.0, 0.0)
+	tela_vitoria.show()
+	var transicao: Tween = create_tween()
+	transicao.set_pause_mode(Tween.TWEEN_PAUSE_PROCESS)
+	transicao.set_trans(Tween.TRANS_CUBIC)
+	transicao.set_ease(Tween.EASE_OUT)
+	transicao.tween_property(tela_vitoria, "modulate", Color(1.0, 1.0, 1.0, 1.0), 0.8)
 
 func _recomecar_jogo() -> void:
 	get_tree().paused = false

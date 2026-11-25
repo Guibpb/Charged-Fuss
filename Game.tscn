@@ -185,6 +185,69 @@ shadow_color = Color(0, 0, 0, 0.55)
 shadow_size = 18
 shadow_offset = Vector2(0, 6)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_painel_vitoria"]
+bg_color = Color(0.018, 0.045, 0.11, 0.99)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.2, 0.66, 1, 1)
+corner_radius_top_left = 18
+corner_radius_top_right = 18
+corner_radius_bottom_right = 18
+corner_radius_bottom_left = 18
+shadow_color = Color(0, 0.04, 0.16, 0.62)
+shadow_size = 20
+shadow_offset = Vector2(0, 7)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_vitoria"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.025, 0.12, 0.24, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.22, 0.62, 0.94, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_vitoria_hover"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.055, 0.25, 0.43, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.34, 0.78, 1, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_botao_vitoria_pressed"]
+content_margin_left = 14.0
+content_margin_top = 10.0
+content_margin_right = 14.0
+content_margin_bottom = 10.0
+bg_color = Color(0.08, 0.32, 0.55, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.42, 0.86, 1, 1)
+corner_radius_top_left = 9
+corner_radius_top_right = 9
+corner_radius_bottom_right = 9
+corner_radius_bottom_left = 9
+
 [node name="Game" type="Node3D" unique_id=1938844436]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.50910604, 0)
 script = ExtResource("1_u44n3")
@@ -741,6 +804,101 @@ theme_override_fonts/font = ExtResource("4_font_bold")
 theme_override_font_sizes/font_size = 18
 text = "SAIR"
 
+[node name="TelaVitoria" type="Control" parent="HUD"]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme = SubResource("Theme_interface")
+
+[node name="Fundo" type="ColorRect" parent="HUD/TelaVitoria"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0.008, 0.025, 0.075, 0.96)
+
+[node name="Cartao" type="Panel" parent="HUD/TelaVitoria"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -410.0
+offset_top = -170.0
+offset_right = 410.0
+offset_bottom = 170.0
+mouse_filter = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_painel_vitoria")
+
+[node name="Mensagem" type="Label" parent="HUD/TelaVitoria/Cartao"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 34.0
+offset_top = 18.0
+offset_right = -34.0
+offset_bottom = -100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
+theme_override_colors/font_color = Color(0.38, 0.84, 1, 1)
+theme_override_colors/font_outline_color = Color(0.015, 0.07, 0.16, 1)
+theme_override_constants/outline_size = 3
+theme_override_font_sizes/font_size = 30
+text = "Parabéns! Você completou\no Nível 1 - Iniciação!"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3
+
+[node name="Acoes" type="HBoxContainer" parent="HUD/TelaVitoria/Cartao"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -236.0
+offset_top = -82.0
+offset_right = 236.0
+offset_bottom = -22.0
+theme_override_constants/separation = 16
+alignment = 1
+
+[node name="Continuar" type="Button" parent="HUD/TelaVitoria/Cartao/Acoes"]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
+theme_override_colors/font_color = Color(0.72, 0.91, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_botao_vitoria")
+theme_override_styles/hover = SubResource("StyleBoxFlat_botao_vitoria_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_botao_vitoria_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_botao_vitoria_pressed")
+text = "Continuar"
+
+[node name="Sair" type="Button" parent="HUD/TelaVitoria/Cartao/Acoes"]
+custom_minimum_size = Vector2(220, 58)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_font_bold")
+theme_override_colors/font_color = Color(0.72, 0.91, 1, 1)
+theme_override_font_sizes/font_size = 18
+theme_override_styles/normal = SubResource("StyleBoxFlat_botao_vitoria")
+theme_override_styles/hover = SubResource("StyleBoxFlat_botao_vitoria_hover")
+theme_override_styles/focus = SubResource("StyleBoxFlat_botao_vitoria_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_botao_vitoria_pressed")
+text = "Sair"
+
 [connection signal="pressed" from="HUD/MenuInicial/Centralizar/Conteudo/Play" to="." method="_on_menu_play_pressed"]
 [connection signal="pressed" from="HUD/TelaDerrota/Cartao/Acoes/Recomecar" to="." method="_recomecar_jogo"]
 [connection signal="pressed" from="HUD/TelaDerrota/Cartao/Acoes/Sair" to="." method="_sair_do_jogo"]
+[connection signal="pressed" from="HUD/TelaVitoria/Cartao/Acoes/Sair" to="." method="_sair_do_jogo"]
