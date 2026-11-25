@@ -17,10 +17,10 @@ const UPGRADE_NAMES: Dictionary = {
 	"balas": "Balas ×2",
 }
 const TOTAL_RODADAS: int = 10
-const INIMIGOS_POR_RODADA: Array[int] = [4, 5, 15, 15, 25, 30, 35, 40, 50, 50]
+const INIMIGOS_POR_RODADA: Array[int] = [5, 8, 15, 15, 25, 30, 35, 40, 50, 50]
 const ENERGIA_POR_DERROTA: int = 1
 const BONUS_RODADA: int = 10
-const INTERVALOS_RODADA: Array[float] = [1.5, 1.5, 1.5, 0.8, 1.0, 1.5, 1.0, 0.8, 1.0, 1.0]
+const INTERVALOS_RODADA: Array[float] = [1.8, 1.8, 1.5, 0.8, 1.0, 1.0, 0.8, 0.6, 0.8, 0.8]
 const TUTORIAIS_RODADA: Array[String] = [
 	"Ative uma torre para defender a rota. A rodada já começou.",
 	"Compare a torre normal com a rápida: elas têm ritmos e setores diferentes.",
@@ -36,7 +36,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 
 @export var enemy_vertical_offset: float = 0.2
 @export var player_health: int = 50
-@export var player_energy: int = 100
+@export var player_energy: int = 65
 @export var path_visual_width: float = METRICA_MAPA.LARGURA_CAMINHO
 @export var path_surface_offset: float = 0.13
 

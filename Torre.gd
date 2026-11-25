@@ -23,6 +23,7 @@ const ALTURA_EIXO_MODELO: float = 0.95
 const ALTURA_TOTAL_MODELO: float = 2.94
 const COMPRIMENTO_CANHAO_MODELO: float = 2.8
 const DESLOCAMENTO_FRENTE_MODELO: float = PI * 0.5
+const ESCALA_MODELO_MELHORADO: float = 1.35
 
 func _ready() -> void:
 	add_to_group("torres")
@@ -118,6 +119,9 @@ func _substituir_modelo_por_upgrade() -> void:
 		modelo_anterior.queue_free()
 
 	modelo.position.z = 0.0
+	modelo.scale *= ESCALA_MODELO_MELHORADO
+	# Mantém a compensação horizontal do GLB proporcional à nova escala.
+	modelo.position.x *= ESCALA_MODELO_MELHORADO
 	var novo_modelo := TURRET_UP_SCENE.instantiate() as Node3D
 	if novo_modelo == null:
 		push_error("Não foi possível carregar o modelo TurretUp.glb.")
@@ -126,6 +130,9 @@ func _substituir_modelo_por_upgrade() -> void:
 	modelo.add_child(novo_modelo)
 	modelo_melhorado = true
 	_preparar_modelo_torre()
+	var identificador := get_node_or_null("Identificador") as Label3D
+	if identificador != null:
+		identificador.position.y = 2.45
 	_atualizar_cor(Color(1.0, 0.56, 0.2, 1.0) if torre_rapida else Color(0.18, 0.58, 0.78, 1.0))
 	definir_direcao_setor(direcao_setor_global)
 

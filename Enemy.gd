@@ -50,7 +50,7 @@ func _ready():
 
 func configurar_como_chefe() -> void:
 	is_boss = true
-	health *= 3
+	health *= 5
 	var modelo_normal := get_node_or_null("inimigo")
 	if modelo_normal != null:
 		remove_child(modelo_normal)

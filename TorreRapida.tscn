@@ -12,8 +12,7 @@ script = ExtResource("1_script")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=976741053]
 shape = SubResource("BoxShape3D_torre")
 
-[node name="Modelo" type="Node3D" parent="."]
-position = Vector3(7.04, -1.12, -1.76)
-scale = Vector3(0.44, 0.44, 0.44)
+[node name="Modelo" type="Node3D" parent="." unique_id=241966539]
+transform = Transform3D(0.44, 0, 0, 0, 0.44, 0, 0, 0, 0.44, 7.04, -1.12, -1.76)
 
-[node name="Turret1" parent="Modelo" instance=ExtResource("2_model")]
+[node name="Turret1" parent="Modelo" unique_id=286303601 instance=ExtResource("2_model")]
