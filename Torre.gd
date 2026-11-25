@@ -89,6 +89,8 @@ func aplicar_upgrade(tipo_upgrade: String) -> void:
 		"dano":
 			damage = roundi(float(damage) * 1.5)
 		"alcance":
+			if torre_rapida:
+				return
 			shot_range *= 1.5
 		"velocidade":
 			shot_interval /= 1.5
@@ -96,8 +98,20 @@ func aplicar_upgrade(tipo_upgrade: String) -> void:
 			balas_por_disparo = 2
 		_:
 			return
+	if modelo_melhorado:
+		if tipo_upgrade == "alcance":
+			_atualizar_visual_de_alcance()
+		return
 	_substituir_modelo_por_upgrade()
-	
+
+func _atualizar_visual_de_alcance() -> void:
+	var indicador_atual := get_node_or_null("IndicadorAlcance") as MeshInstance3D
+	var estava_visivel := indicador_atual != null and indicador_atual.visible
+	_criar_visual_de_alcance()
+	var indicador_novo := get_node_or_null("IndicadorAlcance") as MeshInstance3D
+	if indicador_novo != null and not estava_visivel:
+		indicador_novo.hide()
+
 func _substituir_modelo_por_upgrade() -> void:
 	if modelo_melhorado:
 		return

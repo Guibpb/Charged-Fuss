@@ -36,7 +36,7 @@ const TUTORIAIS_RODADA: Array[String] = [
 
 @export var enemy_vertical_offset: float = 0.2
 @export var player_health: int = 50
-@export var player_energy: int = 65
+@export var player_energy: int = 100
 @export var path_visual_width: float = METRICA_MAPA.LARGURA_CAMINHO
 @export var path_surface_offset: float = 0.13
 
