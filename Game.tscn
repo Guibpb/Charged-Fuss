@@ -303,7 +303,7 @@ theme = ExtResource("7_ui")
 layout_mode = 0
 offset_left = 20.0
 offset_top = 104.0
-offset_right = 340.0
+offset_right = 400.0
 offset_bottom = 104.0
 theme_type_variation = &"PainelOperacao"
 

@@ -30,12 +30,12 @@ theme/custom="res://OrbitronTheme.tres"
 
 [physics]
 
-common/physics_interpolation=true
 3d/physics_engine="Jolt Physics"
+common/physics_interpolation=true
 
 [rendering]
 
 renderer/rendering_method="gl_compatibility"
-scaling_3d/scale=0.8333333
-anti_aliasing/quality/msaa_3d=1
 lights_and_shadows/directional_shadow/size=2048
+anti_aliasing/quality/msaa_3d=1
+scaling_3d/scale=0.8333333

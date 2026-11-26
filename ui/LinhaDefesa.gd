@@ -2,6 +2,7 @@ extends Button
 
 const FONTE_MEDIA = preload("res://fonts/Orbitron-Medium.ttf")
 const FONTE_NEGRITO = preload("res://fonts/Orbitron-Bold.ttf")
+const TAMANHO_MINIATURA_LOJA: float = 96.0
 
 var rotulo_nome: Label
 var rotulo_preco: Label
@@ -10,7 +11,7 @@ var icone: Texture2D
 func montar(icone_defesa: Texture2D = null) -> void:
 	icone = icone_defesa
 	theme_type_variation = &"DefesaDisponivel"
-	custom_minimum_size.y = 64.0
+	custom_minimum_size.y = 64.0 if icone == null else TAMANHO_MINIATURA_LOJA + 16.0
 	var linha := HBoxContainer.new()
 	linha.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(linha)
@@ -19,7 +20,7 @@ func montar(icone_defesa: Texture2D = null) -> void:
 	linha.offset_right = -10.0
 	linha.add_theme_constant_override("separation", 8)
 	if icone != null:
-		linha.add_child(criar_imagem(icone, 48.0))
+		linha.add_child(criar_imagem(icone, TAMANHO_MINIATURA_LOJA))
 	rotulo_nome = Label.new()
 	rotulo_nome.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	rotulo_nome.add_theme_font_override("font", FONTE_MEDIA)

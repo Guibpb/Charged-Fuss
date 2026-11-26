@@ -8,6 +8,12 @@ extends CharacterBody3D
 const TURRET_UP_SCENE: PackedScene = preload("res://modelos/TurretUp.glb")
 const TESLA_SCENE: PackedScene = preload("res://modelos/Tesla1.glb")
 const TESLA_UP_SCENE: PackedScene = preload("res://modelos/Tesla2.glb")
+const CHAMAS_SCENE: PackedScene = preload("res://modelos/lancaChamas1.glb")
+const CHAMAS_UP_SCENE: PackedScene = preload("res://modelos/lancaChamas2.glb")
+const SEMIANGULO_CHAMAS: float = PI / 6.0
+const ESCALA_MODELO_CHAMAS: float = 0.8
+const FATOR_ESCALA_CHAMAS_MELHORADO: float = 1.25
+const VELOCIDADE_ROTACAO_CHAMAS: float = 2.5
 
 var active := false
 var torre_rapida := false
@@ -22,6 +28,7 @@ var parte_superior_rotativa: Node3D
 var ponto_disparo: Node3D
 var efeito_pulso: MeshInstance3D
 var temporizador_pulso: Timer
+var alcance_jato_chamas: float = 0.0
 
 const ALTURA_EIXO_MODELO: float = 0.95
 const ALTURA_TOTAL_MODELO: float = 2.94
@@ -36,7 +43,7 @@ func _ready() -> void:
 	if tipo_torre == "tesla":
 		_preparar_modelo_tesla(false)
 	elif tipo_torre == "chama":
-		_preparar_modelo_chamas()
+		_preparar_modelo_chamas(false)
 	else:
 		_preparar_modelo_torre()
 
@@ -66,37 +73,58 @@ func _preparar_modelo_tesla(melhorado: bool) -> void:
 	var cena_modelo: PackedScene = TESLA_UP_SCENE if melhorado else TESLA_SCENE
 	_preparar_modelo_tesla_malha(cena_modelo, melhorado)
 
-func _preparar_modelo_chamas() -> void:
+func _preparar_modelo_chamas(melhorado: bool) -> void:
 	var modelo := get_node_or_null("Modelo") as Node3D
 	if modelo == null:
 		return
+	var cena_modelo := CHAMAS_UP_SCENE if melhorado else CHAMAS_SCENE
+	var visual := cena_modelo.instantiate() as Node3D
+	var partes := visual.find_children("Turret*", "MeshInstance3D", true, false)
+	if partes.is_empty():
+		visual.free()
+		push_error("O GLB do lança-chamas precisa da malha separada Turret.")
+		return
+
+	var yaw_anterior := global_rotation.y + DESLOCAMENTO_FRENTE_MODELO
+	if parte_superior_rotativa != null:
+		yaw_anterior = parte_superior_rotativa.global_rotation.y
+		remove_child(parte_superior_rotativa)
+		parte_superior_rotativa.queue_free()
 	for filho in modelo.get_children():
 		modelo.remove_child(filho)
 		filho.queue_free()
-	modelo.position = Vector3(0.0, -1.0, 0.0)
-	modelo.scale = Vector3.ONE
-	_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 0.32, 0.0), Vector3(1.4, 0.28, 1.4), Color(0.16, 0.2, 0.23, 1.0))
-	_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 0.72, 0.0), Vector3(0.9, 0.78, 0.9), Color(0.25, 0.3, 0.32, 1.0))
-	_criar_peca_chamas(modelo, BoxMesh.new(), Vector3(0.0, 0.95, 0.0), Vector3(1.15, 0.85, 1.15), Color(0.32, 0.37, 0.39, 1.0))
-	for indice in range(4):
-		var angulo: float = TAU * float(indice) / 4.0
-		var direcao := Vector3(sin(angulo), 0.0, -cos(angulo))
-		var rotacao := Vector3(PI * 0.5, angulo, 0.0)
-		_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(0.0, 1.0, 0.0) + direcao * 0.8, Vector3(0.24, 0.24, 0.6), Color(0.92, 0.37, 0.1, 1.0), rotacao)
-	_atualizar_cor(Color(0.98, 0.42, 0.12, 1.0), 0.13)
 
-func _criar_peca_chamas(pai: Node3D, malha: PrimitiveMesh, posicao: Vector3, escala: Vector3, cor: Color, rotacao: Vector3 = Vector3.ZERO) -> void:
-	var peca := MeshInstance3D.new()
-	peca.mesh = malha
-	peca.position = posicao
-	peca.scale = escala
-	peca.rotation = rotacao
-	var material := StandardMaterial3D.new()
-	material.albedo_color = cor
-	material.metallic = 0.6
-	material.roughness = 0.42
-	peca.material_override = material
-	pai.add_child(peca)
+	var escala_modelo := ESCALA_MODELO_CHAMAS * FATOR_ESCALA_CHAMAS_MELHORADO if melhorado else ESCALA_MODELO_CHAMAS
+	# No GLB inicial, a base e o topo foram exportados 4 unidades à frente no eixo Z.
+	var compensacao_z: float = 0.0 if melhorado else -4.0 * escala_modelo
+	var compensacao_y: float = 0.0291 * escala_modelo if melhorado else 0.0
+	modelo.position = Vector3(0.0, -0.88 + compensacao_y, compensacao_z)
+	modelo.scale = Vector3.ONE * escala_modelo
+	modelo.add_child(visual)
+
+	var pivo := Node3D.new()
+	pivo.name = "ParteSuperiorRotativa"
+	pivo.position.y = modelo.position.y + 0.84 * escala_modelo
+	add_child(pivo)
+	parte_superior_rotativa = pivo
+	for parte in partes:
+		(parte as Node3D).reparent(pivo, true)
+
+	ponto_disparo = Node3D.new()
+	ponto_disparo.name = "PontoDisparo"
+	ponto_disparo.position = Vector3(
+		2.15 if melhorado else 2.03,
+		(1.46 if melhorado else 1.41) - 0.84,
+		0.0 if melhorado else -0.17
+	) * escala_modelo
+	pivo.add_child(ponto_disparo)
+	pivo.global_rotation.y = yaw_anterior
+	pivo.reset_physics_interpolation()
+	modelo.reset_physics_interpolation()
+	modelo_melhorado = melhorado
+	if efeito_pulso != null:
+		efeito_pulso.hide()
+		efeito_pulso = null
 
 func _preparar_modelo_torre() -> void:
 	var modelo := get_node_or_null("Modelo") as Node3D
@@ -197,7 +225,7 @@ func aplicar_upgrade(tipo_upgrade: String) -> void:
 		return
 	if tipo_torre == "chama":
 		if not modelo_melhorado:
-			_adicionar_modulos_chamas()
+			_preparar_modelo_chamas(true)
 		_atualizar_visual_de_alcance()
 		return
 	if modelo_melhorado:
@@ -270,17 +298,15 @@ func _physics_process(delta: float) -> void:
 	if not active:
 		return
 	shot_timer -= delta
+	if tipo_torre == "chama":
+		_atualizar_ataque_chamas(delta)
+		return
 	if shot_timer > 0.0:
 		return
 	if tipo_torre == "tesla":
 		_executar_pulso_tesla()
 		shot_timer = shot_interval
 		return
-	if tipo_torre == "chama":
-		_executar_pulso_chamas()
-		shot_timer = shot_interval
-		return
-
 	var alvo: Node3D = _encontrar_alvo_no_alcance()
 	if alvo == null:
 		return
@@ -291,15 +317,7 @@ func _physics_process(delta: float) -> void:
 		return
 	var yaw_alvo: float = atan2(-direcao_alvo.x, -direcao_alvo.z)
 	if parte_superior_rotativa != null:
-		var yaw_modelo_alvo := yaw_alvo + DESLOCAMENTO_FRENTE_MODELO
-		var diferenca_angular_modelo := wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI)
-		parte_superior_rotativa.global_rotation.y += clampf(
-			diferenca_angular_modelo,
-			-velocidade_rotacao * delta,
-			velocidade_rotacao * delta
-		)
-		var erro_angular_modelo := absf(wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI))
-		if shot_timer <= 0.0 and erro_angular_modelo <= deg_to_rad(3.0):
+		if _girar_topo(yaw_alvo, velocidade_rotacao * delta):
 			_atirar_no_alvo(alvo)
 		return
 
@@ -308,6 +326,32 @@ func _physics_process(delta: float) -> void:
 	var erro_angular_base := absf(wrapf(yaw_alvo - global_rotation.y, -PI, PI))
 	if shot_timer <= 0.0 and erro_angular_base <= deg_to_rad(3.0):
 		_atirar_no_alvo(alvo)
+
+func _girar_topo(yaw_alvo: float, passo_maximo: float) -> bool:
+	var yaw_modelo_alvo := yaw_alvo + DESLOCAMENTO_FRENTE_MODELO
+	var diferenca := wrapf(yaw_modelo_alvo - parte_superior_rotativa.global_rotation.y, -PI, PI)
+	var passo := clampf(diferenca, -passo_maximo, passo_maximo)
+	parte_superior_rotativa.global_rotation.y += passo
+	return absf(diferenca - passo) <= deg_to_rad(3.0)
+
+func _atualizar_ataque_chamas(delta: float) -> void:
+	if parte_superior_rotativa == null or ponto_disparo == null:
+		return
+	var alvo := _encontrar_alvo_no_alcance()
+	if alvo == null:
+		if efeito_pulso != null:
+			efeito_pulso.hide()
+		return
+
+	var direcao := alvo.global_position - global_position
+	var yaw_alvo := atan2(-direcao.x, -direcao.z)
+	var alinhado := _girar_topo(yaw_alvo, VELOCIDADE_ROTACAO_CHAMAS * delta)
+	if not alinhado and (efeito_pulso == null or not efeito_pulso.visible):
+		return
+	_mostrar_jato_chamas()
+	if shot_timer <= 0.0:
+		_executar_pulso_chamas()
+		shot_timer = shot_interval
 
 func _encontrar_alvo_no_alcance() -> Node3D:
 	var target: Node3D = null
@@ -360,44 +404,75 @@ func _executar_pulso_tesla() -> void:
 	_desenhar_raios_tesla(alvos)
 
 func _executar_pulso_chamas() -> void:
-	var alvos := _inimigos_na_area()
-	if alvos.is_empty():
-		return
-	for alvo in alvos:
-		if alvo.has_method("take_damage"):
+	var origem := ponto_disparo.global_position
+	var frente := parte_superior_rotativa.global_basis.x
+	frente.y = 0.0
+	frente = frente.normalized()
+	var largura_angular := cos(SEMIANGULO_CHAMAS)
+	for alvo in _inimigos_na_area():
+		var direcao := alvo.global_position - origem
+		direcao.y = 0.0
+		if direcao.normalized().dot(frente) >= largura_angular and alvo.has_method("take_damage"):
 			alvo.call("take_damage", damage)
-	_mostrar_pulso_chamas()
 
-func _adicionar_modulos_chamas() -> void:
-	var modelo := get_node_or_null("Modelo") as Node3D
-	if modelo == null:
-		return
-	for lado in [-1.0, 1.0]:
-		_criar_peca_chamas(modelo, CylinderMesh.new(), Vector3(lado * 0.62, 0.72, 0.1), Vector3(0.24, 0.8, 0.24), Color(0.8, 0.25, 0.08, 1.0))
-	modelo_melhorado = true
-
-func _mostrar_pulso_chamas() -> void:
+func _mostrar_jato_chamas() -> void:
 	if efeito_pulso == null:
-		var malha_pulso := TorusMesh.new()
-		malha_pulso.inner_radius = 0.72
-		malha_pulso.outer_radius = 0.82
-		malha_pulso.rings = 48
-		malha_pulso.ring_segments = 8
 		var material := StandardMaterial3D.new()
 		material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		material.cull_mode = BaseMaterial3D.CULL_DISABLED
 		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-		material.albedo_color = Color(1.0, 0.32, 0.06, 0.68)
-		material.emission_enabled = true
-		material.emission = Color(1.0, 0.22, 0.025, 1.0)
-		material.emission_energy_multiplier = 2.0
-		_preparar_efeito_pulso(malha_pulso, material)
-		efeito_pulso.name = "PulsoChamas"
-		efeito_pulso.position.y = -0.82
-	var escala := shot_range / 0.82
-	efeito_pulso.scale = Vector3(escala, minf(escala, 2.0), escala)
-	efeito_pulso.reset_physics_interpolation()
+		material.vertex_color_use_as_albedo = true
+		efeito_pulso = MeshInstance3D.new()
+		efeito_pulso.name = "JatoChamas"
+		efeito_pulso.mesh = ImmediateMesh.new()
+		efeito_pulso.material_override = material
+		efeito_pulso.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+		parte_superior_rotativa.add_child(efeito_pulso)
+		alcance_jato_chamas = 0.0
+	if not is_equal_approx(alcance_jato_chamas, shot_range):
+		_criar_malha_jato_chamas()
+		alcance_jato_chamas = shot_range
 	efeito_pulso.show()
-	temporizador_pulso.start(0.18)
+
+func _criar_malha_jato_chamas() -> void:
+	var malha := efeito_pulso.mesh as ImmediateMesh
+	malha.clear_surfaces()
+	malha.surface_begin(Mesh.PRIMITIVE_TRIANGLES)
+	# A malha acompanha o pivô e só precisa ser reconstruída quando o alcance muda.
+	var origem := ponto_disparo.position
+	var deslocamento := origem
+	deslocamento.y = 0.0
+	var raio_quadrado := shot_range * shot_range
+	for i in range(12):
+		var angulo_a := lerpf(-SEMIANGULO_CHAMAS, SEMIANGULO_CHAMAS, float(i) / 12.0)
+		var angulo_b := lerpf(-SEMIANGULO_CHAMAS, SEMIANGULO_CHAMAS, float(i + 1) / 12.0)
+		var raio_a := Vector3.RIGHT.rotated(Vector3.UP, angulo_a)
+		var raio_b := Vector3.RIGHT.rotated(Vector3.UP, angulo_b)
+		var projecao_a := deslocamento.dot(raio_a)
+		var projecao_b := deslocamento.dot(raio_b)
+		var distancia_a := sqrt(maxf(0.0, projecao_a * projecao_a + raio_quadrado - deslocamento.length_squared())) - projecao_a
+		var distancia_b := sqrt(maxf(0.0, projecao_b * projecao_b + raio_quadrado - deslocamento.length_squared())) - projecao_b
+		var ponta_a := origem + raio_a * distancia_a
+		var ponta_b := origem + raio_b * distancia_b
+		var meio_a := origem.lerp(ponta_a, 0.40) + Vector3.UP * (0.08 + 0.10 * sin(float(i) * 2.2))
+		var meio_b := origem.lerp(ponta_b, 0.40) + Vector3.UP * (0.08 + 0.10 * sin(float(i + 1) * 2.2))
+		var nucleo := Color(1.0, 0.8, 0.28, 0.95)
+		var chama := Color(1.0, 0.28 + 0.12 * sin(float(i) * 1.7), 0.04, 0.75)
+		var borda := Color(0.92, 0.12, 0.02, 0.02)
+		_adicionar_face_chamas(malha, origem, meio_a, meio_b, nucleo, chama, chama)
+		_adicionar_face_chamas(malha, meio_a, ponta_a, ponta_b, chama, borda, borda)
+		_adicionar_face_chamas(malha, meio_a, ponta_b, meio_b, chama, borda, chama)
+	malha.surface_end()
+
+func _adicionar_face_chamas(
+	malha: ImmediateMesh, a: Vector3, b: Vector3, c: Vector3, cor_a: Color, cor_b: Color, cor_c: Color
+) -> void:
+	malha.surface_set_color(cor_a)
+	malha.surface_add_vertex(a)
+	malha.surface_set_color(cor_b)
+	malha.surface_add_vertex(b)
+	malha.surface_set_color(cor_c)
+	malha.surface_add_vertex(c)
 
 func _desenhar_raios_tesla(alvos: Array[Node3D]) -> void:
 	if efeito_pulso == null:
