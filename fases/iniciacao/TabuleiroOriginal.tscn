@@ -1,0 +1,159 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://fases/Tabuleiro.gd" id="1_tabuleiro"]
+[ext_resource type="Script" path="res://fases/BaseConstrucao.gd" id="2_base"]
+[ext_resource type="Resource" path="res://fases/iniciacao/Regras.tres" id="3_regras"]
+
+[sub_resource type="Environment" id="Environment_tabuleiro"]
+ambient_light_source = 2
+ambient_light_color = Color(0.86, 0.88, 0.9, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.16
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_vtaim"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_vtaim"]
+margin = 2.858
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wbfu4"]
+resource_local_to_scene = true
+size = Vector2(54.5, 30.7)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tt7e2"]
+albedo_color = Color(0.18, 0.2, 0.23, 1)
+metallic = 0.25
+roughness = 0.65
+
+[sub_resource type="Curve3D" id="Curve3D_j5k5y"]
+_data = {
+"points": PackedVector3Array(0, 0, 0, 0, 0, 1.275, 9.1, -0.35878247, -10.8375, 0, 0, -1.275, -1.6, 0, 0, 9.1, -0.35878247, -7.0125, 1.6, 0, 0, 0, 0, 1.275, -9.1, -0.35878247, -7.0125, 0, 0, -1.275, 1.6, 0, 0, -9.1, -0.35878247, -1.275, -1.6, 0, 0, 0, 0, 1.275, 9.1, -0.35878247, -1.275, 0, 0, -1.275, -1.6, 0, 0, 9.1, -0.35878247, 5.1, 1.6, 0, 0, 0, 0, 1.275, -9.1, -0.35878247, 5.1, 0, 0, -1.275, 0, 0, 0, -9.1, -0.35878247, 10.8375),
+"tilts": PackedFloat32Array(0, 0, 0, 0, 0, 0, 0, 0)
+}
+point_count = 8
+
+[sub_resource type="BoxMesh" id="BoxMesh_base"]
+size = Vector3(2.3, 0.24, 2.3)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_base"]
+albedo_color = Color(0.035, 0.065, 0.08, 1)
+metallic = 0.65
+roughness = 0.55
+
+[node name="TabuleiroOriginal" type="Node3D" node_paths=PackedStringArray("caminho", "container_bases", "camera", "luz", "piso_expansivel", "plano_soltar_comum")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.50910604, 0)
+script = ExtResource("1_tabuleiro")
+caminho = NodePath("Path3D")
+container_bases = NodePath("Bases")
+camera = NodePath("Camera3D")
+luz = NodePath("DirectionalLight3D")
+regras = ExtResource("3_regras")
+piso_expansivel = NodePath("Chão/StaticBody3D/MeshInstance3D")
+plano_soltar_comum = NodePath("Chão/StaticBody3D/MeshInstance3D")
+ajuste_bases_camera = -0.24
+largura_faixa = 1.785
+
+[node name="Camera3D" type="Camera3D" parent="." unique_id=867802795]
+transform = Transform3D(-0.18232116, 0.6190583, -0.76388866, 0, 0.7769104, 0.6296112, 0.98323905, 0.114791445, -0.1416472, -7.8631897, 6.493578, 4.7095504)
+current = true
+fov = 70.3125
+near = 0.3
+far = 100.0
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=386076512]
+environment = SubResource("Environment_tabuleiro")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1444622644]
+transform = Transform3D(0.9221972, -0.3454078, -0.17391308, -0.068022035, -0.58758307, 0.8062997, -0.38069057, -0.7317374, -0.5653629, -0.7800604, 7.3317523, -8.101334)
+light_energy = 1.475
+light_specular = 0.85
+shadow_enabled = true
+shadow_blur = 1.2
+directional_shadow_mode = 1
+directional_shadow_fade_start = 0.92
+directional_shadow_max_distance = 48.0
+
+[node name="Chão" type="Node3D" parent="." unique_id=180397138]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Chão" unique_id=1775617526]
+physics_material_override = SubResource("PhysicsMaterial_vtaim")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Chão/StaticBody3D" unique_id=64052463]
+shape = SubResource("WorldBoundaryShape3D_vtaim")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Chão/StaticBody3D" unique_id=1971918651]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.8239655, 0.12083298, -0.4528885)
+cast_shadow = 0
+mesh = SubResource("PlaneMesh_wbfu4")
+surface_material_override/0 = SubResource("StandardMaterial3D_tt7e2")
+
+[node name="Path3D" type="Path3D" parent="." unique_id=416347350]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.5, 0.35878283, 0)
+curve = SubResource("Curve3D_j5k5y")
+
+[node name="Bases" type="Node3D" parent="."]
+
+[node name="Base01" type="Marker3D" parent="Bases"]
+position = Vector3(-16.6, 0.24, -4.5)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base01"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")
+
+[node name="Base02" type="Marker3D" parent="Bases"]
+position = Vector3(-3.1, 0.24, -10.29)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base02"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")
+
+[node name="Base03" type="Marker3D" parent="Bases"]
+position = Vector3(-6.73, 0.24, -4.23)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base03"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")
+
+[node name="Base04" type="Marker3D" parent="Bases"]
+position = Vector3(-11.94, 0.24, 2.13)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base04"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")
+
+[node name="Base05" type="Marker3D" parent="Bases"]
+position = Vector3(-10.53, 0.24, 8.22)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base05"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")
+
+[node name="Base06" type="Marker3D" parent="Bases"]
+position = Vector3(1.5, 0.24, 1.98)
+script = ExtResource("2_base")
+tolerancia_soltar = 1.75
+altura_indicador = -0.04
+
+[node name="Visual" type="MeshInstance3D" parent="Bases/Base06"]
+position = Vector3(0, -0.12, 0)
+mesh = SubResource("BoxMesh_base")
+material_override = SubResource("StandardMaterial3D_base")

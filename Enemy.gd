@@ -57,9 +57,9 @@ func _ready():
 	elif _modelo_inimigo != null:
 		INSTANCIAS_MODELO.agrupar(_modelo_inimigo, {})
 
-func configurar_como_chefe() -> void:
+func configurar_como_chefe(multiplicador_vida: int = 5) -> void:
 	is_boss = true
-	health *= 5
+	health *= multiplicador_vida
 	var modelo_normal := get_node_or_null("inimigo")
 	if modelo_normal != null:
 		remove_child(modelo_normal)

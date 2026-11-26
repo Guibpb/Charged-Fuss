@@ -29,6 +29,7 @@ var ponto_disparo: Node3D
 var efeito_pulso: MeshInstance3D
 var temporizador_pulso: Timer
 var alcance_jato_chamas: float = 0.0
+var altura_indicador_alcance: float = -0.92
 
 const ALTURA_EIXO_MODELO: float = 0.95
 const ALTURA_TOTAL_MODELO: float = 2.94
@@ -618,6 +619,6 @@ func _criar_visual_de_alcance() -> void:
 	visual.mesh = circulo
 	visual.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
 	add_child(visual)
-	visual.global_position = global_position + Vector3.UP * -0.92
+	visual.global_position = global_position + Vector3.UP * altura_indicador_alcance
 	visual.global_rotation = Vector3.ZERO
 	visual.reset_physics_interpolation()

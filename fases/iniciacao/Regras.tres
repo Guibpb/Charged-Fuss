@@ -1,0 +1,106 @@
+[gd_resource type="Resource" format=3]
+
+[ext_resource type="Script" path="res://fases/RegrasFase.gd" id="1_regras"]
+[ext_resource type="Script" path="res://fases/Rodada.gd" id="2_rodada"]
+
+[sub_resource type="Resource" id="Rodada_1"]
+script = ExtResource("2_rodada")
+quantidade = 5
+vida = 40
+velocidade = 4.0
+intervalo = 1.8
+tutorial = "Arraste sua primeira torre até uma base para começar."
+
+[sub_resource type="Resource" id="Rodada_2"]
+script = ExtResource("2_rodada")
+quantidade = 7
+vida = 40
+velocidade = 4.0
+intervalo = 1.6
+tutorial = "Compare a torre normal com a rápida: elas têm ritmos e alcances diferentes."
+
+[sub_resource type="Resource" id="Rodada_3"]
+script = ExtResource("2_rodada")
+quantidade = 9
+vida = 42
+velocidade = 4.2
+intervalo = 1.5
+tutorial = "Cada inimigo derrotado gera energia para posicionar mais torres."
+
+[sub_resource type="Resource" id="Rodada_4"]
+script = ExtResource("2_rodada")
+quantidade = 11
+vida = 44
+velocidade = 4.2
+intervalo = 1.35
+tutorial = "Observe os círculos de alcance e posicione outras defesas."
+
+[sub_resource type="Resource" id="Rodada_5"]
+script = ExtResource("2_rodada")
+quantidade = 13
+vida = 46
+velocidade = 4.4
+intervalo = 1.2
+tutorial = "Combine torres com características diferentes para cobrir melhor a rota."
+
+[sub_resource type="Resource" id="Rodada_6"]
+script = ExtResource("2_rodada")
+quantidade = 15
+vida = 48
+velocidade = 4.5
+intervalo = 1.1
+tutorial = "Você pode abrir o painel durante a partida; o jogo continuará acontecendo."
+
+[sub_resource type="Resource" id="Rodada_7"]
+script = ExtResource("2_rodada")
+quantidade = 17
+vida = 50
+velocidade = 4.6
+intervalo = 1.0
+tutorial = "Distribua as torres para cobrir trechos diferentes do caminho."
+
+[sub_resource type="Resource" id="Rodada_8"]
+script = ExtResource("2_rodada")
+quantidade = 19
+vida = 54
+velocidade = 4.8
+intervalo = 0.9
+tutorial = "Mais inimigos estarão na rota ao mesmo tempo. Acompanhe o campo inteiro."
+
+[sub_resource type="Resource" id="Rodada_9"]
+script = ExtResource("2_rodada")
+quantidade = 22
+vida = 56
+velocidade = 4.9
+intervalo = 0.85
+tutorial = "Prepare suas torres para a rodada final e guarde energia quando puder."
+
+[sub_resource type="Resource" id="Rodada_10"]
+script = ExtResource("2_rodada")
+quantidade = 26
+vida = 60
+velocidade = 5.0
+intervalo = 0.72
+tutorial = "Última rodada: derrote o chefe, que tem três vezes a vida normal."
+tem_chefe = true
+
+[resource]
+script = ExtResource("1_regras")
+titulo_menu = "Fase 1 - Iniciação"
+mensagem_vitoria = "Parabéns! Você completou o Nível 1 - Iniciação!"
+vida_inicial = 50
+energia_inicial = 100
+energia_por_eliminacao = 1
+bonus_rodada = 15
+dano_fuga = 1
+dano_fuga_chefe = 35
+multiplicador_vida_chefe = 5
+intervalo_entre_rodadas = 3.0
+custos_torres = Dictionary[String, int]({"basica": 60, "rapida": 70, "tesla": 65, "chama": 70})
+custos_upgrades = Dictionary[String, int]({"dano": 45, "alcance": 30, "velocidade": 55, "balas": 65, "tesla_rapidez": 55, "tesla_alcance": 35, "chama_dano": 45, "chama_alcance": 35})
+atributos_torres = Dictionary[String, Dictionary]({
+"rapida": {"shot_range": 4.8, "shot_interval": 0.22},
+"tesla": {"shot_range": 5.8, "damage": 4},
+"chama": {"shot_range": 4.4, "damage": 5}
+})
+rodadas = Array[ExtResource("2_rodada")]([SubResource("Rodada_1"), SubResource("Rodada_2"), SubResource("Rodada_3"), SubResource("Rodada_4"), SubResource("Rodada_5"), SubResource("Rodada_6"), SubResource("Rodada_7"), SubResource("Rodada_8"), SubResource("Rodada_9"), SubResource("Rodada_10")])
