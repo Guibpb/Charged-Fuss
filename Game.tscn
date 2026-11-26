@@ -49,7 +49,7 @@ anchor_right = 1.0
 offset_left = -404.0
 offset_top = 20.0
 offset_right = -20.0
-offset_bottom = 252.0
+offset_bottom = 322.0
 mouse_filter = 2
 theme = ExtResource("7_ui")
 
@@ -129,6 +129,15 @@ offset_top = 226.0
 offset_right = 384.0
 offset_bottom = 270.0
 text = "Resolução"
+
+[node name="SairPausa" type="Button" parent="HUD/Operacao"]
+visible = false
+layout_mode = 0
+offset_left = 208.0
+offset_top = 278.0
+offset_right = 384.0
+offset_bottom = 322.0
+text = "Sair do jogo"
 
 [node name="GerenciarTorres" type="Button" parent="HUD" unique_id=2075826603]
 visible = false
@@ -369,6 +378,7 @@ layout_mode = 2
 theme_type_variation = &"AcaoPrincipal"
 text = "Sair"
 
+[connection signal="pressed" from="HUD/Operacao/SairPausa" to="." method="_sair_do_jogo"]
 [connection signal="pressed" from="HUD/MenuInicial/Conteudo/Play" to="." method="_on_menu_play_pressed"]
 [connection signal="pressed" from="HUD/TelaDerrota/Centro/Cartao/Conteudo/Acoes/Recomecar" to="." method="_recomecar_jogo"]
 [connection signal="pressed" from="HUD/TelaDerrota/Centro/Cartao/Conteudo/Acoes/Sair" to="." method="_sair_do_jogo"]

@@ -1,7 +1,7 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://ctx642xbykuxl"]
 
-[ext_resource type="Script" path="res://fases/RegrasFase.gd" id="1_regras"]
-[ext_resource type="Script" path="res://fases/Rodada.gd" id="2_rodada"]
+[ext_resource type="Script" uid="uid://dqlvhkdxebopv" path="res://fases/RegrasFase.gd" id="1_regras"]
+[ext_resource type="Script" uid="uid://d1xsryu5gol4" path="res://fases/Rodada.gd" id="2_rodada"]
 
 [sub_resource type="Resource" id="Rodada_1"]
 script = ExtResource("2_rodada")
@@ -24,7 +24,7 @@ script = ExtResource("2_rodada")
 quantidade = 8
 vida = 43
 velocidade = 6.2
-intervalo = 1.90
+intervalo = 1.9
 tutorial = "As eliminações e o fim das rodadas rendem energia para novas defesas."
 
 [sub_resource type="Resource" id="Rodada_4"]
@@ -32,7 +32,6 @@ script = ExtResource("2_rodada")
 quantidade = 10
 vida = 48
 velocidade = 6.4
-intervalo = 1.80
 tutorial = "Observe os círculos de alcance. A plataforma mais afastada depende de uma melhoria de alcance."
 
 [sub_resource type="Resource" id="Rodada_5"]
@@ -56,7 +55,7 @@ script = ExtResource("2_rodada")
 quantidade = 13
 vida = 64
 velocidade = 6.9
-intervalo = 1.60
+intervalo = 1.6
 tutorial = "Distribua as torres para cobrir trechos diferentes do caminho."
 
 [sub_resource type="Resource" id="Rodada_8"]
@@ -72,7 +71,7 @@ script = ExtResource("2_rodada")
 quantidade = 17
 vida = 76
 velocidade = 7.3
-intervalo = 1.50
+intervalo = 1.5
 tutorial = "Prepare suas torres para a rodada final e guarde energia quando puder."
 
 [sub_resource type="Resource" id="Rodada_10"]
@@ -87,22 +86,43 @@ tem_chefe = true
 [resource]
 script = ExtResource("1_regras")
 titulo_menu = "Fase 1 - Iniciação"
-instrucao_inicial = "Arraste uma defesa até uma base livre perto da pista."
 mensagem_vitoria = "Parabéns! Você completou o Nível 1 - Iniciação!"
-vida_inicial = 50
+instrucao_inicial = "Arraste uma defesa até uma base livre perto da pista."
 energia_inicial = 105
-energia_por_eliminacao = 1
 bonus_rodada = 20
-dano_fuga = 1
-dano_fuga_chefe = 35
 multiplicador_vida_chefe = 3
-intervalo_entre_rodadas = 3.0
-custos_torres = Dictionary[String, int]({"basica": 60, "rapida": 65, "tesla": 55, "chama": 65})
-custos_upgrades = Dictionary[String, int]({"dano": 45, "alcance": 42, "velocidade": 45, "balas": 55, "tesla_rapidez": 45, "tesla_alcance": 32, "chama_dano": 40, "chama_alcance": 32})
+custos_torres = Dictionary[String, int]({
+"basica": 60,
+"chama": 65,
+"rapida": 65,
+"tesla": 55
+})
+custos_upgrades = Dictionary[String, int]({
+"alcance": 42,
+"balas": 55,
+"chama_alcance": 32,
+"chama_dano": 40,
+"dano": 45,
+"tesla_alcance": 32,
+"tesla_rapidez": 45,
+"velocidade": 45
+})
 atributos_torres = Dictionary[String, Dictionary]({
-"basica": {"shot_range": 6.1},
-"rapida": {"shot_range": 5.6, "shot_interval": 0.24, "damage": 8},
-"tesla": {"shot_range": 6.3, "damage": 5},
-"chama": {"shot_range": 5.5, "damage": 7}
+"basica": {
+"shot_range": 6.1
+},
+"chama": {
+"damage": 7,
+"shot_range": 5.5
+},
+"rapida": {
+"damage": 8,
+"shot_interval": 0.24,
+"shot_range": 5.6
+},
+"tesla": {
+"damage": 5,
+"shot_range": 6.3
+}
 })
 rodadas = Array[ExtResource("2_rodada")]([SubResource("Rodada_1"), SubResource("Rodada_2"), SubResource("Rodada_3"), SubResource("Rodada_4"), SubResource("Rodada_5"), SubResource("Rodada_6"), SubResource("Rodada_7"), SubResource("Rodada_8"), SubResource("Rodada_9"), SubResource("Rodada_10")])

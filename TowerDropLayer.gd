@@ -6,6 +6,7 @@ var tipo_arrastado := ""
 var cursor_arraste := Vector2(-1.0, -1.0)
 
 func _ready() -> void:
+	set_process(false)
 	get_window().mouse_exited.connect(_limpar_cursor)
 
 func _limpar_cursor() -> void:
@@ -14,11 +15,13 @@ func _limpar_cursor() -> void:
 func ativar_destino(tipo: String) -> void:
 	tipo_arrastado = tipo
 	mouse_filter = Control.MOUSE_FILTER_STOP
+	set_process(true)
 
 func encerrar_destino() -> void:
 	tipo_arrastado = ""
 	_limpar_cursor()
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
+	set_process(false)
 	if is_instance_valid(controlador):
 		controlador.call("mostrar_base_para_soltar", -1)
 

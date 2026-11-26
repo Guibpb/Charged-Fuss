@@ -340,6 +340,8 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 	_verificar_fim_rodada()
 
 func _on_enemy_reached_end(eh_chefe: bool) -> void:
+	if fase_encerrada:
+		return
 	var dano: int = regras.dano_fuga_chefe if eh_chefe else regras.dano_fuga
 	player_health = maxi(0, player_health - dano)
 	_update_health_label()
@@ -352,6 +354,8 @@ func _on_enemy_reached_end(eh_chefe: bool) -> void:
 	_resolver_inimigo()
 
 func _on_enemy_defeated(eh_chefe: bool) -> void:
+	if fase_encerrada:
+		return
 	player_energy += regras.energia_por_eliminacao
 	_mostrar_ganho_energia(regras.energia_por_eliminacao, false)
 	_atualizar_economia()
@@ -431,6 +435,7 @@ func _encerrar_fase(vitoria: bool) -> void:
 	botao_gerenciar_torres.hide()
 	botao_pause.hide()
 	$HUD/Operacao/Resolucao.hide()
+	$HUD/Operacao/SairPausa.hide()
 	velocidade_label.hide()
 	Engine.time_scale = 1.0
 	nivel_velocidade = 1
@@ -469,6 +474,7 @@ func _alternar_pausa() -> void:
 	get_tree().paused = not get_tree().paused
 	botao_pause.text = "Retomar" if get_tree().paused else "Pausar"
 	$HUD/Operacao/Resolucao.visible = get_tree().paused
+	$HUD/Operacao/SairPausa.visible = get_tree().paused
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	var tecla_evento: InputEventKey = event as InputEventKey

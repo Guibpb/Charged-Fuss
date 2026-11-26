@@ -16,11 +16,13 @@ const METRICA_MAPA = preload("res://MetricaMapa.gd")
 
 @export_group("Enquadramento")
 @export var enquadrar_automaticamente: bool = true
-@export var deslocamento_camera: Vector3 = Vector3(13, 20, 18)
+@export var deslocamento_camera: Vector3 = Vector3(13, 20, 50)
 @export var altura_minima_camera: float = METRICA_MAPA.ALTURA_EFETIVA
 @export var altura_torres_camera: float = 4.0
 @export var margem_mundo: Vector2 = Vector2(4.0, 2.2)
 @export var margens_tela: Vector4 = Vector4(364, 156, 42, 50)
+## Comprimento do trecho final ignorado ao calcular o enquadramento.
+@export var trecho_final_fora_do_enquadramento: float = 0.0
 # Pontos locais adicionais para regiões importantes fora da rota e das bases.
 @export var pontos_enquadramento: PackedVector3Array
 
@@ -49,8 +51,16 @@ func enquadrar(tela: Vector2, bases: Array[BaseConstrucao]) -> void:
 	var minimo := Vector2(INF, INF)
 	var maximo := Vector2(-INF, -INF)
 	var pontos := PackedVector3Array()
-	for ponto in caminho.curve.get_baked_points():
-		pontos.append(caminho.to_global(ponto))
+	var pontos_rota := caminho.curve.get_baked_points()
+	var fim_visivel := maxf(0.0, caminho.curve.get_baked_length() - trecho_final_fora_do_enquadramento)
+	var distancia := 0.0
+	for indice in range(pontos_rota.size()):
+		if trecho_final_fora_do_enquadramento > 0.0 and indice > 0:
+			distancia += pontos_rota[indice - 1].distance_to(pontos_rota[indice])
+			if distancia > fim_visivel:
+				pontos.append(caminho.to_global(caminho.curve.sample_baked(fim_visivel)))
+				break
+		pontos.append(caminho.to_global(pontos_rota[indice]))
 	for base in bases:
 		var referencia := base.global_position + Vector3.UP * ajuste_bases_camera
 		pontos.append(referencia)

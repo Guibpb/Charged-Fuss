@@ -1,21 +1,16 @@
-[gd_resource type="Resource" format=3]
+[gd_resource type="Resource" format=3 uid="uid://c10bfbuyogv77"]
 
-[ext_resource type="Script" path="res://fases/RegrasFase.gd" id="1_regras"]
-[ext_resource type="Script" path="res://fases/Rodada.gd" id="2_rodada"]
+[ext_resource type="Script" uid="uid://dqlvhkdxebopv" path="res://fases/RegrasFase.gd" id="1_regras"]
+[ext_resource type="Script" uid="uid://d1xsryu5gol4" path="res://fases/Rodada.gd" id="2_rodada"]
 
 [sub_resource type="Resource" id="Rodada_1"]
 script = ExtResource("2_rodada")
 quantidade = 5
-vida = 40
-velocidade = 4.0
-intervalo = 1.8
 tutorial = "Arraste sua primeira torre até uma base para começar."
 
 [sub_resource type="Resource" id="Rodada_2"]
 script = ExtResource("2_rodada")
 quantidade = 7
-vida = 40
-velocidade = 4.0
 intervalo = 1.6
 tutorial = "Compare a torre normal com a rápida: elas têm ritmos e alcances diferentes."
 
@@ -88,19 +83,34 @@ tem_chefe = true
 script = ExtResource("1_regras")
 titulo_menu = "Fase 1 - Iniciação"
 mensagem_vitoria = "Parabéns! Você completou o Nível 1 - Iniciação!"
-vida_inicial = 50
-energia_inicial = 100
-energia_por_eliminacao = 1
-bonus_rodada = 15
-dano_fuga = 1
-dano_fuga_chefe = 35
-multiplicador_vida_chefe = 5
-intervalo_entre_rodadas = 3.0
-custos_torres = Dictionary[String, int]({"basica": 60, "rapida": 70, "tesla": 65, "chama": 70})
-custos_upgrades = Dictionary[String, int]({"dano": 45, "alcance": 30, "velocidade": 55, "balas": 65, "tesla_rapidez": 55, "tesla_alcance": 35, "chama_dano": 45, "chama_alcance": 35})
+custos_torres = Dictionary[String, int]({
+"basica": 60,
+"chama": 70,
+"rapida": 70,
+"tesla": 65
+})
+custos_upgrades = Dictionary[String, int]({
+"alcance": 30,
+"balas": 65,
+"chama_alcance": 35,
+"chama_dano": 45,
+"dano": 45,
+"tesla_alcance": 35,
+"tesla_rapidez": 55,
+"velocidade": 55
+})
 atributos_torres = Dictionary[String, Dictionary]({
-"rapida": {"shot_range": 4.8, "shot_interval": 0.22},
-"tesla": {"shot_range": 5.8, "damage": 4},
-"chama": {"shot_range": 4.4, "damage": 5}
+"chama": {
+"damage": 5,
+"shot_range": 4.4
+},
+"rapida": {
+"shot_interval": 0.22,
+"shot_range": 4.8
+},
+"tesla": {
+"damage": 4,
+"shot_range": 5.8
+}
 })
 rodadas = Array[ExtResource("2_rodada")]([SubResource("Rodada_1"), SubResource("Rodada_2"), SubResource("Rodada_3"), SubResource("Rodada_4"), SubResource("Rodada_5"), SubResource("Rodada_6"), SubResource("Rodada_7"), SubResource("Rodada_8"), SubResource("Rodada_9"), SubResource("Rodada_10")])
