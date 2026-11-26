@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://fases/Tabuleiro.gd" id="1_tabuleiro"]
 [ext_resource type="PackedScene" uid="uid://vdro0cib0euy" path="res://modelos/map.glb" id="2_mapa"]
 [ext_resource type="Script" path="res://fases/BaseConstrucao.gd" id="3_base"]
-[ext_resource type="Resource" path="res://fases/iniciacao/Regras.tres" id="4_regras"]
+[ext_resource type="Resource" path="res://fases/iniciacao/RegrasMapaNovo.tres" id="4_regras"]
 
 [sub_resource type="Environment" id="Environment_mapa"]
 background_mode = 1
