@@ -5,7 +5,7 @@
 [ext_resource type="FontFile" uid="uid://mo5xh87pu3k0" path="res://fonts/Orbitron-Bold.ttf" id="4_font_bold"]
 [ext_resource type="Theme" path="res://ui/TemaInterface.tres" id="7_ui"]
 [ext_resource type="Script" uid="uid://jj7rylvre6d5" path="res://ui/MenuInicial.gd" id="8_menu"]
-[ext_resource type="PackedScene" path="res://fases/iniciacao/TabuleiroOriginal.tscn" id="9_tabuleiro"]
+[ext_resource type="PackedScene" path="res://fases/iniciacao/TabuleiroNovo.tscn" id="9_tabuleiro"]
 
 [node name="Game" type="Node3D" unique_id=1938844436]
 script = ExtResource("1_u44n3")

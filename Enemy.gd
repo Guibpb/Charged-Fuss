@@ -18,6 +18,7 @@ class SegmentoEsteira:
 	var posicao_x: float = 0.0
 
 var health: int = 40
+var escala_visual: float = 1.0
 var is_boss: bool = false
 var multiplicador_lentidao: float = 1.0
 var tempo_lentidao: float = 0.0
@@ -52,7 +53,7 @@ func _ready():
 	caminho = get_parent() as PathFollow3D
 	_modelo_inimigo = get_node_or_null("boss" if is_boss else "inimigo") as Node3D
 	if not is_boss and _modelo_inimigo != null:
-		_modelo_inimigo.scale = Vector3.ONE * 1.25
+		_modelo_inimigo.scale = Vector3.ONE * (1.25 * escala_visual)
 		_preparar_esteiras()
 	elif _modelo_inimigo != null:
 		INSTANCIAS_MODELO.agrupar(_modelo_inimigo, {})
@@ -76,8 +77,8 @@ func configurar_como_chefe(multiplicador_vida: int = 5) -> void:
 		push_error("O modelo do chefe precisa ter um nó raiz Node3D: " + CAMINHO_MODELO_CHEFE)
 		return
 	modelo_chefe.name = "boss"
-	modelo_chefe.scale = Vector3.ONE * 1.15
-	modelo_chefe.position.y = 0.12
+	modelo_chefe.scale = Vector3.ONE * (1.15 * escala_visual)
+	modelo_chefe.position.y = 0.12 * escala_visual
 	add_child(modelo_chefe)
 
 func _physics_process(delta) -> void:
@@ -190,7 +191,7 @@ func _atualizar_esteiras(distancia: float) -> void:
 	if distancia <= 0.0 or _comprimento_total_esteira <= 0.0:
 		return
 
-	_avanco_esteira = fposmod(_avanco_esteira + distancia, _comprimento_total_esteira)
+	_avanco_esteira = fposmod(_avanco_esteira + distancia / escala_visual, _comprimento_total_esteira)
 	var transformacao_modelo := _modelo_inimigo.global_transform
 	for elo in _segmentos_esteira:
 		var amostra: Vector4 = _amostrar_percurso(elo.progresso + _avanco_esteira)

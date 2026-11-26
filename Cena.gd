@@ -317,10 +317,11 @@ func _iniciar_rodada(numero_rodada: int) -> void:
 		caminho.add_child(path_follow)
 
 		var enemy := ENEMY_SCENE.instantiate() as CharacterBody3D
+		var eh_chefe: bool = rodada.tem_chefe and indice == quantidade_na_rodada
 		enemy.position.y = tabuleiro.altura_inimigo
+		enemy.set("escala_visual", tabuleiro.escala_visual_chefe if eh_chefe else tabuleiro.escala_visual_drone)
 		enemy.set("health", rodada.vida)
 		enemy.set("speed", rodada.velocidade)
-		var eh_chefe: bool = rodada.tem_chefe and indice == quantidade_na_rodada
 		if eh_chefe:
 			enemy.call("configurar_como_chefe", regras.multiplicador_vida_chefe)
 		enemy.connect("reached_end", _on_enemy_reached_end.bind(eh_chefe))
@@ -699,9 +700,10 @@ func _instalar_torre(indice: int, tipo: String) -> bool:
 		push_error("Não foi possível criar a torre escolhida.")
 		return false
 	var base := bases[indice]
+	var altura: float = tabuleiro.alturas_torres.get(tipo, base.altura_torre)
 	torre.call("configurar_tipo", tipo)
-	torre.position = Vector3.UP * base.altura_torre
-	torre.set("altura_indicador_alcance", base.altura_indicador - base.altura_torre)
+	torre.position = Vector3.UP * altura
+	torre.set("altura_indicador_alcance", base.altura_indicador - altura)
 	base.add_child(torre)
 	torres[indice] = torre
 	tipos_ativados[indice] = tipo

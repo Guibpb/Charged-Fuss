@@ -10,6 +10,9 @@ const METRICA_MAPA = preload("res://MetricaMapa.gd")
 @export var luz: DirectionalLight3D
 @export var regras: RegrasFase
 @export var altura_inimigo: float = 0.2
+@export var escala_visual_drone: float = 1.0
+@export var escala_visual_chefe: float = 1.0
+@export var alturas_torres: Dictionary[String, float] = {}
 
 @export_group("Enquadramento")
 @export var enquadrar_automaticamente: bool = true
