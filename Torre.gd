@@ -212,7 +212,7 @@ func aplicar_upgrade(tipo_upgrade: String) -> void:
 		"tesla_rapidez":
 			shot_interval = 0.5
 		"tesla_alcance":
-			shot_range *= 1.25
+			shot_range *= 1.4
 		"chama_dano":
 			damage = roundi(float(damage) * 1.5)
 		"chama_alcance":
